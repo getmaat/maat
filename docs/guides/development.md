@@ -5,6 +5,7 @@ summary: How to set up, run, and contribute to Ma'at locally.
 related_code:
   - .goreleaser.yaml
   - .github/workflows/release.yml
+  - scripts/render-homebrew-formula.sh
 ---
 
 # Development guide
@@ -74,6 +75,40 @@ GitHub pre-releases automatically.
 
 Once a tag is pushed, `go install github.com/UemitCebi/maat@latest` resolves it
 through the Go module proxy.
+
+### Homebrew
+
+Ma'at is distributed through a personal tap,
+[`UemitCebi/homebrew-tap`](https://github.com/UemitCebi/homebrew-tap):
+
+```bash
+brew install UemitCebi/tap/maat
+```
+
+The tap holds a cross-platform **formula** (`Formula/maat.rb`) that installs the
+pre-built binary on both macOS and Linuxbrew. A formula — rather than a Cask — is
+deliberate: Casks are macOS-only and trigger a Gatekeeper prompt on our unsigned
+binary, whereas a formula installs the binary cleanly on both platforms.
+
+The formula is regenerated on every release by
+[`scripts/render-homebrew-formula.sh`](../../scripts/render-homebrew-formula.sh),
+which reads the version and `dist/checksums.txt` that GoReleaser produced and
+prints the formula to stdout (it is pure — no network, no side effects). The
+`release` workflow runs it and pushes the result to the tap. This is wired as a
+custom step instead of GoReleaser's deprecated `brews:` block (which now emits a
+Cask). Publishing requires a `HOMEBREW_TAP_TOKEN` repository secret on `maat` —
+a token with push access to the tap repo; if it is unset, the step is skipped
+with a warning and the GitHub Release still succeeds.
+
+To preview or regenerate the formula locally:
+
+```bash
+scripts/render-homebrew-formula.sh 0.1.0 dist/checksums.txt
+```
+
+A true bare `brew install maat` (no tap) would require acceptance into
+homebrew-core, which has a notability bar and ongoing-maintenance obligations —
+revisit once the project has traction.
 
 ## Coding conventions
 

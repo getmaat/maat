@@ -2,6 +2,7 @@ name: release
 
 # Cut a release when a semver tag is pushed. GoReleaser cross-compiles the
 # binaries, builds the archives + checksums, and publishes the GitHub Release.
+# A follow-up step regenerates the Homebrew formula and pushes it to the tap.
 on:
   push:
     tags:
@@ -32,3 +33,35 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Publish a cross-platform Homebrew *formula* (macOS + Linuxbrew, no
+      # Gatekeeper quarantine) to UemitCebi/homebrew-tap. Uses the checksums
+      # GoReleaser just wrote to dist/checksums.txt. Skips gracefully if the
+      # HOMEBREW_TAP_TOKEN secret is not configured, so the GitHub Release is
+      # never blocked on it.
+      - name: Update Homebrew tap formula
+        env:
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          if [ -z "${HOMEBREW_TAP_TOKEN}" ]; then
+            echo "::warning::HOMEBREW_TAP_TOKEN not set — skipping Homebrew formula update."
+            exit 0
+          fi
+
+          VERSION="${GITHUB_REF_NAME#v}"
+          ./scripts/render-homebrew-formula.sh "$VERSION" dist/checksums.txt > /tmp/maat.rb
+
+          git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/UemitCebi/homebrew-tap.git" /tmp/tap
+          mkdir -p /tmp/tap/Formula
+          cp /tmp/maat.rb /tmp/tap/Formula/maat.rb
+
+          cd /tmp/tap
+          git config user.name "Ümit Cebi"
+          git config user.email "uemit@xebi.media"
+          if git diff --quiet -- Formula/maat.rb; then
+            echo "Formula already up to date for ${GITHUB_REF_NAME}."
+          else
+            git add Formula/maat.rb
+            git commit -m "Update maat formula to ${GITHUB_REF_NAME}"
+            git push
+          fi

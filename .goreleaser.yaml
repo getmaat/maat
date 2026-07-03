@@ -61,3 +61,9 @@ release:
     name: maat
   draft: false
   prerelease: auto
+
+# NOTE: Homebrew publishing is intentionally NOT done via GoReleaser's `brews:`
+# block — that generates a Cask on current GoReleaser, which is macOS-only and
+# triggers Gatekeeper on our unsigned binary. Instead, the release workflow runs
+# scripts/render-homebrew-formula.sh to publish a cross-platform *formula* to the
+# tap (macOS + Linuxbrew, no quarantine). See docs/guides/development.md.
