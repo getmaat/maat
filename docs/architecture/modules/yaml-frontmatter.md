@@ -3,8 +3,8 @@ title: YAML & front-matter module
 status: current
 summary: The dependency-free parsing layer — a YAML subset and Markdown front-matter I/O.
 related_code:
-  - internal/codedoc/yaml.go
-  - internal/codedoc/frontmatter.go
+  - internal/maat/yaml.go
+  - internal/maat/frontmatter.go
 ---
 
 # YAML & front-matter
@@ -12,20 +12,20 @@ related_code:
 ## Responsibility
 
 Provide just enough YAML to read and write document front-matter **without any
-third-party dependency**. This module is the foundation the rest of CodeDoc
+third-party dependency**. This module is the foundation the rest of Ma'at
 builds on; it is intentionally the only place that touches YAML syntax.
 
 It is **not** a general-purpose YAML implementation. It supports the subset
-that CodeDoc's front-matter and `.codedoc.yml` actually use, and nothing more.
+that Ma'at's front-matter and `.maat.yml` actually use, and nothing more.
 
 ## Key files
 
-- `internal/codedoc/yaml.go` — a small recursive parser for a YAML subset:
+- `internal/maat/yaml.go` — a small recursive parser for a YAML subset:
   scalars (with `int`/`float`/`bool`/`null` coercion), quoted strings, flow
   lists (`[a, b]`), block lists (`- item`), and nested mappings by
   indentation. Exposes `yamlParse(text) (any, error)`. The tool only ever
   *reads* YAML, so there is no emitter.
-- `internal/codedoc/frontmatter.go` — splits a Markdown file into its
+- `internal/maat/frontmatter.go` — splits a Markdown file into its
   `---`-delimited front-matter block and body. Exposes
   `fmSplit(text) (meta map[string]any, body string, err error)` and the
   file-reading convenience `fmRead(path)`.
@@ -34,7 +34,7 @@ that CodeDoc's front-matter and `.codedoc.yml` actually use, and nothing more.
 
 - `fmSplit("")` returns an empty map and no error — an empty or absent block is
   valid, never an error.
-- Parsing is read-only and deterministic: CodeDoc never re-emits parsed YAML.
+- Parsing is read-only and deterministic: Ma'at never re-emits parsed YAML.
   Generated Markdown is produced by templating and spliced between managed
   markers, so front-matter the tool did not author is preserved verbatim and
   files do not thrash in version control.

@@ -1,7 +1,7 @@
 ---
 title: Troubleshooting
 status: current
-summary: Common codedoc check failures and how to resolve them.
+summary: Common maat check failures and how to resolve them.
 ---
 
 # Troubleshooting
@@ -11,11 +11,11 @@ summary: Common codedoc check failures and how to resolve them.
 The file was hand-edited or a `sync` was forgotten. Run:
 
 ```bash
-codedoc sync
+maat sync
 ```
 
 Then commit the regenerated files. Never edit inside a
-`<!-- codedoc:begin -->` / `<!-- codedoc:end -->` block or a generated `.mdc`
+`<!-- maat:begin -->` / `<!-- maat:end -->` block or a generated `.mdc`
 file — put your prose outside the managed region.
 
 ## `check` reports **staleness** but the doc is actually current
@@ -26,11 +26,11 @@ newer than the doc. If you have reviewed the doc and it is correct, re-save it
 so its timestamp advances:
 
 ```bash
-codedoc sync     # or just touch/re-save the doc file
+maat sync     # or just touch/re-save the doc file
 ```
 
 If a path should never trigger staleness (generated code, vendored files), add
-it to `check.ignore_code_paths` in `.codedoc.yml`.
+it to `check.ignore_code_paths` in `.maat.yml`.
 
 ## `check` reports **orphaned_code**
 
@@ -46,8 +46,8 @@ links (`http`, `mailto`, `#anchors`) are not checked.
 
 ## `check` exits `2` with "No docs/ directory"
 
-CodeDoc has not been initialized here, or `docs_dir` in `.codedoc.yml` points
-somewhere else. Run `codedoc init` or fix the config.
+Ma'at has not been initialized here, or `docs_dir` in `.maat.yml` points
+somewhere else. Run `maat init` or fix the config.
 
 ## A doc fails the **frontmatter** check
 

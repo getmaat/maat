@@ -1,4 +1,4 @@
-package codedoc
+package maat
 
 import (
 	"os"

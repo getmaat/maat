@@ -1,4 +1,4 @@
-# CodeDoc configuration. All keys are optional; defaults shown below.
+# Ma'at configuration. All keys are optional; defaults shown below.
 project_name: {{PROJECT}}
 project_summary: {{SUMMARY_INLINE}}
 

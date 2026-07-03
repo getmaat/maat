@@ -1,4 +1,4 @@
-package codedoc
+package maat
 
 import (
 	"os"
@@ -21,7 +21,7 @@ func run(t *testing.T, args ...string) (string, string, int) {
 	return out.String(), errb.String(), code
 }
 
-// initRepo scaffolds a fresh CodeDoc repo in a temp dir and returns its root.
+// initRepo scaffolds a fresh Ma'at repo in a temp dir and returns its root.
 func initRepo(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()
@@ -72,10 +72,10 @@ func TestInitCreatesScaffold(t *testing.T) {
 		"AGENTS.md",
 		"docs/index.md",
 		"docs/llms.txt",
-		".codedoc.yml",
+		".maat.yml",
 		"CLAUDE.md",
 		".github/copilot-instructions.md",
-		".cursor/rules/codedoc.mdc",
+		".cursor/rules/maat.mdc",
 		".hermes.md",
 	} {
 		if _, err := os.Stat(filepath.Join(root, rel)); err != nil {
@@ -164,7 +164,7 @@ func TestCheckWithoutDocsExits2(t *testing.T) {
 	if code != 2 {
 		t.Fatalf("expected exit 2, got %d", code)
 	}
-	if !strings.Contains(errOut, "Run `codedoc init` first") {
+	if !strings.Contains(errOut, "Run `maat init` first") {
 		t.Errorf("expected init hint on stderr, got: %s", errOut)
 	}
 }
@@ -286,7 +286,7 @@ func TestCheckIgnoreCodePathsSuppressesStaleness(t *testing.T) {
 	writeFile(t, root, "vendor/lib.py", "x = 1\n")
 	writeFile(t, root, "docs/architecture/modules/v.md",
 		"---\ntitle: V\nstatus: current\nsummary: x\nrelated_code:\n  - vendor/lib.py\n---\n# V\n")
-	writeFile(t, root, ".codedoc.yml", "check:\n  ignore_code_paths:\n    - vendor/\n")
+	writeFile(t, root, ".maat.yml", "check:\n  ignore_code_paths:\n    - vendor/\n")
 	run(t, "sync", root)
 	makeNewer(t, filepath.Join(root, "vendor/lib.py"))
 
@@ -309,7 +309,7 @@ func TestPartialConfigMergePreservesDefaults(t *testing.T) {
 	writeFile(t, root, "docs/architecture/modules/m.md",
 		"---\ntitle: M\nstatus: current\nsummary: x\nrelated_code:\n  - src/thing.py\n---\n# M\n")
 	// Override only drift_is_error; staleness default (warn) must survive.
-	writeFile(t, root, ".codedoc.yml", "check:\n  drift_is_error: false\n")
+	writeFile(t, root, ".maat.yml", "check:\n  drift_is_error: false\n")
 	run(t, "sync", root)
 	makeNewer(t, filepath.Join(root, "src/thing.py"))
 
@@ -333,7 +333,7 @@ func TestCheckGitHubFormat(t *testing.T) {
 	if code != 1 {
 		t.Fatalf("expected exit 1, got %d", code)
 	}
-	if !strings.Contains(out, "::error ") || !strings.Contains(out, "title=codedoc drift") {
+	if !strings.Contains(out, "::error ") || !strings.Contains(out, "title=maat drift") {
 		t.Errorf("expected GitHub annotation, got: %s", out)
 	}
 }
@@ -344,7 +344,7 @@ func TestCheckGitHubFormat(t *testing.T) {
 
 func TestCheckUnknownAdapterErrors(t *testing.T) {
 	root := initRepo(t)
-	writeFile(t, root, ".codedoc.yml", "adapters:\n  - claude\n  - bogus\n")
+	writeFile(t, root, ".maat.yml", "adapters:\n  - claude\n  - bogus\n")
 	_, errOut, code := run(t, "check", root)
 	if code != 2 {
 		t.Fatalf("expected exit 2 for bad config, got %d", code)
@@ -356,7 +356,7 @@ func TestCheckUnknownAdapterErrors(t *testing.T) {
 
 func TestCheckBadStalenessValueErrors(t *testing.T) {
 	root := initRepo(t)
-	writeFile(t, root, ".codedoc.yml", "check:\n  staleness: sometimes\n")
+	writeFile(t, root, ".maat.yml", "check:\n  staleness: sometimes\n")
 	_, errOut, code := run(t, "check", root)
 	if code != 2 {
 		t.Fatalf("expected exit 2 for bad staleness, got %d", code)
@@ -375,7 +375,7 @@ func TestVersionFlag(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("--version exited %d", code)
 	}
-	if !strings.Contains(out, "codedoc "+Version) {
+	if !strings.Contains(out, "maat "+Version) {
 		t.Errorf("expected version string, got: %s", out)
 	}
 }

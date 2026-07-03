@@ -1,4 +1,4 @@
-package codedoc
+package maat
 
 import (
 	"strings"
@@ -7,8 +7,8 @@ import (
 // Managed-region markers. Generated content lives between these so a file can
 // mix generated and hand-written sections.
 const (
-	beginMarker = "<!-- codedoc:begin (generated — edit the source docs, not this block) -->"
-	endMarker   = "<!-- codedoc:end -->"
+	beginMarker = "<!-- maat:begin (generated — edit the source docs, not this block) -->"
+	endMarker   = "<!-- maat:end -->"
 )
 
 // splice inserts or replaces the managed region inside existing. If no markers

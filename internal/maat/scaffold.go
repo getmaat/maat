@@ -1,4 +1,4 @@
-package codedoc
+package maat
 
 import (
 	"embed"
@@ -9,9 +9,9 @@ import (
 	"time"
 )
 
-// templatesFS holds the scaffold content written by `codedoc init`. These are
+// templatesFS holds the scaffold content written by `maat init`. These are
 // byte-for-byte the same templates the reference Python implementation ships,
-// extracted from codedoc/scaffold.py at build time. The CodeDoc repo's own
+// extracted from codedoc/scaffold.py at build time. The Ma'at repo's own
 // docs are hand-written (richer than the scaffold) so the project dogfoods the
 // framework; only init consumes these.
 //
@@ -60,8 +60,8 @@ var scaffoldFiles = []scaffoldFile{
 	{"docs/meta/maintenance.md", "meta_maintenance.md"},
 	{"templates/adr.md", "adr_template.md"},
 	{"templates/module.md", "module_template.md"},
-	{".codedoc.yml", "config.yml"},
-	{".github/workflows/codedoc.yml", "workflow.yml"},
+	{".maat.yml", "config.yml"},
+	{".github/workflows/maat.yml", "workflow.yml"},
 }
 
 func fill(text string, subs map[string]string) string {
@@ -85,7 +85,7 @@ type InitResult struct {
 	Generated []string
 }
 
-// RunInit scaffolds CodeDoc into root. Existing files are skipped unless force
+// RunInit scaffolds Ma'at into root. Existing files are skipped unless force
 // is set, so re-running init is safe. After stamping files it runs sync.
 func RunInit(root, project, summary string, force bool) (*InitResult, error) {
 	summary = strings.TrimSpace(summary)

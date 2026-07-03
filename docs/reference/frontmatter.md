@@ -3,23 +3,23 @@ title: Front-matter reference
 status: current
 summary: The YAML front-matter schema every doc in docs/ carries.
 related_code:
-  - internal/codedoc/model.go
-  - internal/codedoc/frontmatter.go
+  - internal/maat/model.go
+  - internal/maat/frontmatter.go
 ---
 
 # Front-matter reference
 
 Every Markdown file under `docs/` begins with a YAML front-matter block
-delimited by `---`. It carries the metadata CodeDoc uses to build indexes and
+delimited by `---`. It carries the metadata Ma'at uses to build indexes and
 run validation.
 
 ```markdown
 ---
 title: Check engine module
 status: current
-summary: The validation rules behind `codedoc check`.
+summary: The validation rules behind `maat check`.
 related_code:
-  - internal/codedoc/check.go
+  - internal/maat/check.go
 ---
 
 # Check engine
@@ -36,7 +36,7 @@ related_code:
 | `related_code` | optional | list of paths | Source files this doc describes; enables staleness + orphan checks |
 
 Which fields are *required* is configurable via `required_frontmatter` in
-`.codedoc.yml` (default: `title`, `status`). The allowed `status` values are
+`.maat.yml` (default: `title`, `status`). The allowed `status` values are
 configurable via `statuses`.
 
 ## `related_code`

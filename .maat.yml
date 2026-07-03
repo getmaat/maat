@@ -1,5 +1,5 @@
-# CodeDoc configuration. All keys are optional; defaults shown below.
-project_name: CodeDoc
+# Ma'at configuration. All keys are optional; defaults shown below.
+project_name: "Ma'at"
 project_summary: A documentation-as-code framework that keeps a repository's docs, its cross-agent instruction files, and its source code in lockstep — maintainable by AI agents, human developers, and CI alike.
 
 docs_dir: docs

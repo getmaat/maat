@@ -12,7 +12,7 @@ summary: How to run and write tests, and what the CI expects to be green.
 
 ## What CI enforces
 
-<!-- Which checks gate a merge, including `codedoc check`. -->
+<!-- Which checks gate a merge, including `maat check`. -->
 
 ## Writing tests
 

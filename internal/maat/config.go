@@ -1,4 +1,4 @@
-package codedoc
+package maat
 
 import (
 	"fmt"
@@ -22,15 +22,15 @@ var adapterTargets = map[string]adapterTarget{
 	"claude":   {"CLAUDE.md", "pointer", "Claude Code"},
 	"hermes":   {".hermes.md", "pointer", "Hermes"},
 	"copilot":  {".github/copilot-instructions.md", "pointer", "GitHub Copilot"},
-	"cursor":   {".cursor/rules/codedoc.mdc", "mdc", "Cursor"},
-	"windsurf": {".windsurf/rules/codedoc.md", "pointer", "Windsurf"},
+	"cursor":   {".cursor/rules/maat.mdc", "mdc", "Cursor"},
+	"windsurf": {".windsurf/rules/maat.md", "pointer", "Windsurf"},
 	"gemini":   {"GEMINI.md", "pointer", "Gemini CLI"},
 }
 
-const configFilename = ".codedoc.yml"
+const configFilename = ".maat.yml"
 
 // defaultConfig returns a fresh copy of the default configuration. Every knob
-// has a default so a repo can adopt CodeDoc with an empty or absent config
+// has a default so a repo can adopt Ma'at with an empty or absent config
 // file and still get sensible behaviour.
 func defaultConfig() map[string]any {
 	return map[string]any{
@@ -68,7 +68,7 @@ func mergeConfig(base, override map[string]any) map[string]any {
 	return out
 }
 
-// LoadConfig loads merged config from <root>/.codedoc.yml, or defaults when the
+// LoadConfig loads merged config from <root>/.maat.yml, or defaults when the
 // file is absent or empty.
 func LoadConfig(root string) (map[string]any, error) {
 	path := filepath.Join(root, configFilename)

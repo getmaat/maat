@@ -18,28 +18,28 @@ summary: Superseded by ADR 0005. The zero-runtime-dependency goal is preserved b
 
 ## Context
 
-CodeDoc's value is that *any* repository and *any* agent harness can adopt it.
+Ma'at's value is that *any* repository and *any* agent harness can adopt it.
 A tool that requires `pip install` — and therefore a resolved, compatible
 dependency environment — is friction at exactly the moment we want none:
-the first time someone drops CodeDoc into an existing project, and every time
+the first time someone drops Ma'at into an existing project, and every time
 a CI job or an agent shells out to it.
 
 The most tempting dependency is a YAML library (PyYAML) for reading
-front-matter and `.codedoc.yml`.
+front-matter and `.maat.yml`.
 
 ## Decision
 
-CodeDoc will have **zero runtime dependencies** and target **Python 3.8+**
+Ma'at will have **zero runtime dependencies** and target **Python 3.8+**
 using only the standard library. Rather than depend on PyYAML we ship a small
 YAML *subset* parser/emitter (`codedoc/_yaml.py`) covering exactly the
-front-matter and config syntax CodeDoc uses.
+front-matter and config syntax Ma'at uses.
 
 Test-time and lint-time tools (pytest, type checkers) are allowed as
 development dependencies, because they are never needed to *run* the tool.
 
 ## Consequences
 
-- CodeDoc can be vendored as a directory and run with `python3 -m codedoc`
+- Ma'at can be vendored as a directory and run with `python3 -m codedoc`
   anywhere, including minimal CI images, with no install step.
 - We own a small amount of YAML-parsing code and must keep it within the subset
   it supports; exotic YAML in front-matter is intentionally unsupported.

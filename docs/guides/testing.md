@@ -1,7 +1,7 @@
 ---
 title: Testing guide
 status: current
-summary: How to run and write CodeDoc's tests, and what CI enforces.
+summary: How to run and write Ma'at's tests, and what CI enforces.
 ---
 
 # Testing guide
@@ -10,8 +10,8 @@ summary: How to run and write CodeDoc's tests, and what CI enforces.
 
 ```bash
 go test ./...                                  # whole suite
-go test ./internal/codedoc/                    # one package
-go test ./internal/codedoc/ -run TestCheckStrictPromotesStaleness   # one test
+go test ./internal/maat/                    # one package
+go test ./internal/maat/ -run TestCheckStrictPromotesStaleness   # one test
 ```
 
 The tests exercise the CLI end to end against temporary directories: they run
@@ -19,23 +19,23 @@ The tests exercise the CLI end to end against temporary directories: they run
 
 ## What CI enforces
 
-The [`CodeDoc` workflow](../../.github/workflows/codedoc.yml) runs on every pull
+The [`Ma'at` workflow](../../.github/workflows/maat.yml) runs on every pull
 request and push to the main branch. It builds the binary and runs:
 
 ```bash
-go build -o codedoc ./cmd/codedoc
-./codedoc check --format github
+go build -o maat .
+./maat check --format github
 ```
 
 A merge is blocked if `check` reports any error-severity finding — stale docs,
 broken internal links, missing `related_code` targets, or drifted generated
-files. Fix them by updating the relevant doc and running `codedoc sync`.
+files. Fix them by updating the relevant doc and running `maat sync`.
 
 ## Writing tests
 
-- Tests live in `internal/codedoc/` (e.g. `cli_test.go`) and use Go's `testing`
+- Tests live in `internal/maat/` (e.g. `cli_test.go`) and use Go's `testing`
   package with `t.TempDir()` for isolation.
-- Prefer black-box tests that invoke the CLI through `codedoc.Main([...])` and
+- Prefer black-box tests that invoke the CLI through `maat.Main([...])` and
   assert on the return code, over testing internal functions — this keeps the
   CLI contract (documented in the [CLI reference](../reference/cli.md)) covered.
 - When you add a validation rule, add a test that proves it both *fires* on a

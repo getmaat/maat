@@ -1,7 +1,7 @@
 ---
 title: Glossary
 status: current
-summary: Definitions of CodeDoc's domain terms.
+summary: Definitions of Ma'at's domain terms.
 ---
 
 # Glossary
@@ -34,8 +34,8 @@ carrying `title`, `status`, `summary`, and optional `related_code`.
 **llms.txt** — the machine-readable index of the docs tree, following the
 [llms.txt](https://llmstxt.org) convention; the first file an agent reads.
 
-**Managed region** — the span between `<!-- codedoc:begin -->` and
-`<!-- codedoc:end -->` markers in an otherwise hand-written file, into which
+**Managed region** — the span between `<!-- maat:begin -->` and
+`<!-- maat:end -->` markers in an otherwise hand-written file, into which
 `sync` splices generated content.
 
 **`related_code`** — a front-matter list naming the source files a doc

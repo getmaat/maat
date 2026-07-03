@@ -1,14 +1,14 @@
-# CodeDoc
+# Ma'at
 
 > A documentation-as-code framework that keeps a repository's docs, its cross-agent instruction files, and its source code in lockstep — maintainable by AI agents, human developers, and CI alike.
 
 This file indexes the project's documentation for AI agents and tools. Each link points to a Markdown document; agents should read the ones relevant to the task before making changes.
 
 ## Architecture — how the system is built
-- [Check engine module](docs/architecture/modules/check.md): The validation rules behind `codedoc check` — the CI gate.
+- [Check engine module](docs/architecture/modules/check.md): The validation rules behind `maat check` — the CI gate.
 - [Model & generators module](docs/architecture/modules/model-generate.md): Scanning the docs tree into a model and rendering derived artifacts from it.
 - [YAML & front-matter module](docs/architecture/modules/yaml-frontmatter.md): The dependency-free parsing layer — a YAML subset and Markdown front-matter I/O.
-- [Architecture Overview](docs/architecture/overview.md): How CodeDoc is built — the CLI pipeline, the docs model, and the generate/validate split.
+- [Architecture Overview](docs/architecture/overview.md): How Ma'at is built — the CLI pipeline, the docs model, and the generate/validate split.
 
 ## Decisions — why it is built that way (ADRs)
 - [0001 Record architecture decisions](docs/decisions/0001-record-architecture-decisions.md): We will use Architecture Decision Records to document significant choices.
@@ -19,21 +19,21 @@ This file indexes the project's documentation for AI agents and tools. Each link
 - [Architecture Decision Records](docs/decisions/README.md): Index of ADRs — the append-only log of why the system is the way it is.
 
 ## Guides — how to work on it
-- [Adopting CodeDoc in a repository](docs/guides/deployment.md): How to add CodeDoc to an existing project and wire it into CI.
-- [Development guide](docs/guides/development.md): How to set up, run, and contribute to CodeDoc locally.
-- [Testing guide](docs/guides/testing.md): How to run and write CodeDoc's tests, and what CI enforces.
-- [Troubleshooting](docs/guides/troubleshooting.md): Common codedoc check failures and how to resolve them.
+- [Adopting Ma'at in a repository](docs/guides/deployment.md): How to add Ma'at to an existing project and wire it into CI.
+- [Development guide](docs/guides/development.md): How to set up, run, and contribute to Ma'at locally.
+- [Testing guide](docs/guides/testing.md): How to run and write Ma'at's tests, and what CI enforces.
+- [Troubleshooting](docs/guides/troubleshooting.md): Common maat check failures and how to resolve them.
 
 ## Reference — factual surface (config, env, API)
-- [CLI reference](docs/reference/cli.md): Every codedoc command, flag, and exit code.
-- [Configuration reference](docs/reference/configuration.md): Every .codedoc.yml key, its default, and its effect.
-- [Environment variables](docs/reference/environment.md): Environment variables CodeDoc reads.
+- [CLI reference](docs/reference/cli.md): Every maat command, flag, and exit code.
+- [Configuration reference](docs/reference/configuration.md): Every .maat.yml key, its default, and its effect.
+- [Environment variables](docs/reference/environment.md): Environment variables Ma'at reads.
 - [Front-matter reference](docs/reference/frontmatter.md): The YAML front-matter schema every doc in docs/ carries.
 
 ## Meta — conventions and glossary
 - [Documentation conventions](docs/meta/conventions.md): The rules this documentation set follows so it stays consistent.
-- [Glossary](docs/meta/glossary.md): Definitions of CodeDoc's domain terms.
+- [Glossary](docs/meta/glossary.md): Definitions of Ma'at's domain terms.
 - [Maintaining the documentation](docs/meta/maintenance.md): How the docs stay in sync with the code — the lifecycle and tooling.
 
 ## Entry points
-- [CodeDoc Documentation](docs/index.md): Entry point and map for the CodeDoc documentation set.
+- [Ma'at Documentation](docs/index.md): Entry point and map for the Ma'at documentation set.

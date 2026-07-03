@@ -61,13 +61,13 @@ When you modify code, update docs as follows:
 Then regenerate derived indexes and adapter files:
 
 ```bash
-codedoc sync
+maat sync
 ```
 
 And validate before committing:
 
 ```bash
-codedoc check     # fails on stale/broken/missing docs
+maat check     # fails on stale/broken/missing docs
 ```
 
 ### Front-matter every doc carries
@@ -88,7 +88,7 @@ related_code:              # source paths this doc describes (optional)
 ## Human approval
 
 Agents may draft documentation changes, but a human reviews them in the pull
-request alongside the code. The CI check (`codedoc check`) enforces that docs
+request alongside the code. The CI check (`maat check`) enforces that docs
 were updated; the reviewer confirms they are *correct*.
 
 ## Setup, build, and test commands

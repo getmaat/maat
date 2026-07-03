@@ -1,4 +1,4 @@
-package codedoc
+package maat
 
 import (
 	"fmt"
@@ -136,9 +136,9 @@ func checkDrift(model *DocsModel, cfg map[string]any, root string) []Finding {
 		path := filepath.Join(root, art.rel)
 		actual := readFileOrEmpty(path)
 		if normalizeText(actual) != normalizeText(art.content) {
-			reason := "out of date — run `codedoc sync`"
+			reason := "out of date — run `maat sync`"
 			if actual == "" {
-				reason = "missing — run `codedoc sync`"
+				reason = "missing — run `maat sync`"
 			}
 			findings = append(findings, Finding{sev, "drift", art.rel, reason})
 		}

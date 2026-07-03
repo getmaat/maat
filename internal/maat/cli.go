@@ -1,4 +1,4 @@
-package codedoc
+package maat
 
 import (
 	"fmt"
@@ -27,16 +27,16 @@ type usageError struct{ msg string }
 
 func (e *usageError) Error() string { return e.msg }
 
-const usageText = `usage: codedoc [--version] <command> [options] [PATH]
+const usageText = `usage: maat [--version] <command> [options] [PATH]
 
 Documentation-as-code for humans and AI agents.
 
 commands:
-  init    scaffold CodeDoc into a repository
+  init    scaffold Ma'at into a repository
   sync    regenerate llms.txt, adapters, index
   check   validate docs (CI gate)
 
-Run 'codedoc <command> --help' for command-specific options.`
+Run 'maat <command> --help' for command-specific options.`
 
 // Main is the CLI entry point. It returns a process exit code. stdout/stderr
 // are injected so tests can capture output. This is the Go analogue of the
@@ -50,7 +50,7 @@ func Main(argv []string, stdout, stderr io.Writer) int {
 	// Top-level --version / -h before a subcommand.
 	switch argv[0] {
 	case "--version":
-		fmt.Fprintf(stdout, "codedoc %s\n", Version)
+		fmt.Fprintf(stdout, "maat %s\n", Version)
 		return 0
 	case "-h", "--help":
 		fmt.Fprintln(stdout, usageText)
@@ -70,17 +70,17 @@ func Main(argv []string, stdout, stderr io.Writer) int {
 	case "check":
 		code, err = cmdCheck(rest, stdout, stderr)
 	default:
-		fmt.Fprintf(stderr, "codedoc: error: unknown command %s\n", pyRepr(command))
+		fmt.Fprintf(stderr, "maat: error: unknown command %s\n", pyRepr(command))
 		fmt.Fprintln(stderr, usageText)
 		return 2
 	}
 
 	if err != nil {
 		if ue, ok := err.(*usageError); ok {
-			fmt.Fprintf(stderr, "codedoc: error: %s\n", ue.msg)
+			fmt.Fprintf(stderr, "maat: error: %s\n", ue.msg)
 			return 2
 		}
-		fmt.Fprintf(stderr, "codedoc: error: %s\n", err)
+		fmt.Fprintf(stderr, "maat: error: %s\n", err)
 		return 2
 	}
 	return code
@@ -184,8 +184,8 @@ func cmdInit(args []string, stdout, stderr io.Writer) (int, error) {
 	for _, rel := range result.Generated {
 		fmt.Fprintf(stdout, "  gen     %s\n", rel)
 	}
-	fmt.Fprintf(stdout, "\nCodeDoc initialized in %s\n"+
-		"Next: edit AGENTS.md's project overview, then run `codedoc check`.\n", root)
+	fmt.Fprintf(stdout, "\nMa'at initialized in %s\n"+
+		"Next: edit AGENTS.md's project overview, then run `maat check`.\n", root)
 	return 0, nil
 }
 
@@ -236,7 +236,7 @@ func cmdCheck(args []string, stdout, stderr io.Writer) (int, error) {
 	docsDir := AnyToStr(cfg["docs_dir"])
 	docsPath := filepath.Join(root, docsDir)
 	if info, err := os.Stat(docsPath); err != nil || !info.IsDir() {
-		fmt.Fprintf(stderr, "No %s/ directory found. Run `codedoc init` first.\n", docsDir)
+		fmt.Fprintf(stderr, "No %s/ directory found. Run `maat init` first.\n", docsDir)
 		return 2, nil
 	}
 
@@ -283,6 +283,6 @@ func emitGitHub(findings []Finding, stdout io.Writer) {
 		if strings.ContainsRune(f.Where, os.PathSeparator) || strings.Contains(f.Where, "/") {
 			loc = "file=" + f.Where + ","
 		}
-		fmt.Fprintf(stdout, "::%s %stitle=codedoc %s::%s\n", level, loc, f.Code, f.Message)
+		fmt.Fprintf(stdout, "::%s %stitle=maat %s::%s\n", level, loc, f.Code, f.Message)
 	}
 }

@@ -1,9 +1,9 @@
 ---
 title: Check engine module
 status: current
-summary: The validation rules behind `codedoc check` — the CI gate.
+summary: The validation rules behind `maat check` — the CI gate.
 related_code:
-  - internal/codedoc/check.go
+  - internal/maat/check.go
 ---
 
 # Check engine
@@ -11,11 +11,11 @@ related_code:
 ## Responsibility
 
 Validate the documentation set and report problems as structured `Finding`
-objects. This is what `codedoc check` runs and what CI gates merges on.
+objects. This is what `maat check` runs and what CI gates merges on.
 
 ## Key files
 
-- `internal/codedoc/check.go` — one function per rule, plus `RunAll()` which
+- `internal/maat/check.go` — one function per rule, plus `RunAll()` which
   runs them in order and sorts findings (errors first, then by location).
 
 ## The rules
@@ -28,7 +28,7 @@ objects. This is what `codedoc check` runs and what CI gates merges on.
 | `staleness` | warn | A `related_code` file modified more recently than its doc |
 | `drift` | error | A generated file that differs from what `sync` would write |
 
-Severities are configurable in `.codedoc.yml` under `check:`. `--strict`
+Severities are configurable in `.maat.yml` under `check:`. `--strict`
 promotes `staleness` to an error (useful for a stricter CI lane).
 
 ## Interfaces / contracts

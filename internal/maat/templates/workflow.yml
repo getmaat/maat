@@ -1,4 +1,4 @@
-name: CodeDoc
+name: Ma'at
 
 # Validates that documentation stayed in sync with code on every pull request.
 on:
@@ -14,10 +14,10 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "1.24"
-      - name: Build codedoc
-        # CodeDoc is a single static Go binary. This builds it from a vendored
-        # copy under ./cmd/codedoc. If you obtain the binary another way
+      - name: Build maat
+        # Ma'at is a single static Go binary. This builds it from a vendored
+        # copy under .. If you obtain the binary another way
         # (released artifact, module install), replace this step accordingly.
-        run: go build -o "$RUNNER_TEMP/codedoc" ./cmd/codedoc
-      - name: Run codedoc check
-        run: '"$RUNNER_TEMP/codedoc" check --format github'
+        run: go build -o "$RUNNER_TEMP/maat" .
+      - name: Run maat check
+        run: '"$RUNNER_TEMP/maat" check --format github'

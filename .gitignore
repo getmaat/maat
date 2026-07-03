@@ -1,6 +1,5 @@
 # Go build output
-/codedoc
-/cmd/codedoc/codedoc
+/maat
 *.exe
 *.test
 *.out

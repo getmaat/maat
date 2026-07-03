@@ -1,4 +1,4 @@
-name: CodeDoc
+name: Ma'at
 
 # Validates that documentation stayed in sync with code on every pull request.
 on:
@@ -14,7 +14,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "1.24"
-      - name: Build codedoc
-        run: go build -o "$RUNNER_TEMP/codedoc" ./cmd/codedoc
-      - name: Run codedoc check
-        run: '"$RUNNER_TEMP/codedoc" check --format github'
+      - name: Build maat
+        run: go build -o "$RUNNER_TEMP/maat" .
+      - name: Run maat check
+        run: '"$RUNNER_TEMP/maat" check --format github'

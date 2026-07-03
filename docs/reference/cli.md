@@ -1,28 +1,28 @@
 ---
 title: CLI reference
 status: current
-summary: Every codedoc command, flag, and exit code.
+summary: Every maat command, flag, and exit code.
 related_code:
-  - internal/codedoc/cli.go
+  - internal/maat/cli.go
 ---
 
 # CLI reference
 
-CodeDoc is a single self-contained binary invoked as `codedoc <command>`. All
+Ma'at is a single self-contained binary invoked as `maat <command>`. All
 commands take an optional trailing `PATH` argument — the repository root — which
 defaults to the current directory.
 
 ```
-codedoc init  [--name NAME] [--summary TEXT] [--force] [PATH]
-codedoc sync  [PATH]
-codedoc check [--format text|github] [--strict] [PATH]
-codedoc --version
+maat init  [--name NAME] [--summary TEXT] [--force] [PATH]
+maat sync  [PATH]
+maat check [--format text|github] [--strict] [PATH]
+maat --version
 ```
 
 ## `init`
 
-Scaffold CodeDoc into a repository: writes `AGENTS.md`, the `docs/` tree,
-`templates/`, `.codedoc.yml`, and the CI workflow, then runs `sync` to produce
+Scaffold Ma'at into a repository: writes `AGENTS.md`, the `docs/` tree,
+`templates/`, `.maat.yml`, and the CI workflow, then runs `sync` to produce
 the derived files.
 
 | Flag | Effect |
@@ -40,7 +40,7 @@ Regenerate every derived artifact from the docs tree: `docs/llms.txt`, the
 managed navigation block in `docs/index.md`, and the configured agent adapter
 files. Only files whose content actually changes are rewritten. Run this after
 editing any doc's front-matter, adding/removing a doc, or changing the adapter
-list in `.codedoc.yml`.
+list in `.maat.yml`.
 
 ## `check`
 

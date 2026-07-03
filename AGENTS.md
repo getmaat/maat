@@ -1,4 +1,4 @@
-# CodeDoc
+# Ma'at
 
 <!--
 This is the single source of truth for AI coding agents working in this
@@ -14,19 +14,19 @@ docs/ — this file tells agents how to FIND and MAINTAIN those docs.
 
 ## Project overview
 
-CodeDoc is a **documentation-as-code framework** that keeps three things in
+Ma'at is a **documentation-as-code framework** that keeps three things in
 lockstep: a repository's `docs/` tree, its cross-agent instruction files, and
 its source code. It is designed so that documentation can be maintained
 interchangeably by AI coding agents, human developers, and CI — and so that
 **any** agent harness (Claude Code, Copilot, Codex, Cursor, Windsurf, Hermes,
 opencode, and others) discovers and updates the same docs.
 
-CodeDoc ships a small, **zero-dependency Go CLI** (`codedoc`) — distributed as
+Ma'at ships a small, **zero-dependency Go CLI** (`maat`) — distributed as
 a single static binary — with three verbs — `init`, `sync`, `check` — and a
 documented convention for how the `docs/` tree is structured and kept current.
 
 This repository **dogfoods itself**: the docs you are reading were scaffolded
-by `codedoc init` and are validated by `codedoc check` in CI.
+by `maat init` and are validated by `maat check` in CI.
 
 ## Where the documentation lives
 
@@ -72,8 +72,8 @@ When you modify code, update docs as follows:
 Then regenerate derived indexes and adapter files, and validate:
 
 ```bash
-codedoc sync      # regenerate llms.txt, docs/index.md nav, adapters
-codedoc check     # fails on stale/broken/missing/drifted docs
+maat sync      # regenerate llms.txt, docs/index.md nav, adapters
+maat check     # fails on stale/broken/missing/drifted docs
 ```
 
 ### Front-matter every doc carries
@@ -87,7 +87,7 @@ title: Human-readable title
 status: current            # current | draft | deprecated
 summary: One-line description used in indexes.
 related_code:              # source paths this doc describes (optional)
-  - internal/codedoc/check.go
+  - internal/maat/check.go
 ---
 ```
 
@@ -95,31 +95,31 @@ Full schema: [`docs/reference/frontmatter.md`](docs/reference/frontmatter.md).
 
 ## Setup, build, and test commands
 
-CodeDoc is a single static binary with **no runtime dependencies**. Building it
+Ma'at is a single static binary with **no runtime dependencies**. Building it
 requires Go 1.24+.
 
 ```bash
 # Run the CLI from a clone (no install needed):
-go run ./cmd/codedoc --help
+go run . --help
 
 # Build a standalone binary:
-go build -o codedoc ./cmd/codedoc
+go build -o maat .
 
 # Validate the docs (this is what CI runs):
-go run ./cmd/codedoc check
+go run . check
 
 # Regenerate derived files after editing docs:
-go run ./cmd/codedoc sync
+go run . sync
 
 # Run the test suite:
 go test ./...
 ```
 
-Before declaring any change done: run `go run ./cmd/codedoc check` **and**
+Before declaring any change done: run `go run . check` **and**
 `go test ./...`, and make sure both are green.
 
 ## Human approval
 
 Agents may draft documentation changes, but a human reviews them in the pull
-request alongside the code. CI (`codedoc check`) enforces that docs were kept
+request alongside the code. CI (`maat check`) enforces that docs were kept
 in sync; the reviewer confirms they are *correct*.

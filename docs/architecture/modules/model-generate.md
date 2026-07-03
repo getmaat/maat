@@ -3,9 +3,9 @@ title: Model & generators module
 status: current
 summary: Scanning the docs tree into a model and rendering derived artifacts from it.
 related_code:
-  - internal/codedoc/model.go
-  - internal/codedoc/generate.go
-  - internal/codedoc/sync.go
+  - internal/maat/model.go
+  - internal/maat/generate.go
+  - internal/maat/sync.go
 ---
 
 # Model & generators
@@ -18,18 +18,18 @@ managed navigation block inside `docs/index.md`.
 
 ## Key files
 
-- `internal/codedoc/model.go` — `ScanModel(root, docsDir)` walks the
+- `internal/maat/model.go` — `ScanModel(root, docsDir)` walks the
   docs directory, parses each Markdown file's front-matter, and produces a
   `DocsModel` holding `Document` values (with `Rel`, `Meta`, `Status`,
   `RelatedCode`, and helpers to extract Markdown links). Files whose name begins
   with `_` (e.g. `decisions/_template.md`) are treated as templates/partials and
   skipped, so they never appear in indexes or validation while remaining valid
   link targets on disk.
-- `internal/codedoc/generate.go` — pure rendering functions: `llmsTxt()`,
+- `internal/maat/generate.go` — pure rendering functions: `llmsTxt()`,
   `indexNav()`, `adapterContent()`, plus `splice()` which inserts generated
-  text between `<!-- codedoc:begin -->` / `<!-- codedoc:end -->` markers
+  text between `<!-- maat:begin -->` / `<!-- maat:end -->` markers
   without disturbing hand-written content around them.
-- `internal/codedoc/sync.go` — `expectedArtifacts()` composes the generators
+- `internal/maat/sync.go` — `expectedArtifacts()` composes the generators
   into the full ordered `{path: content}` map; `writeArtifacts()` writes only
   changed files.
 

@@ -1,18 +1,18 @@
 ---
 title: Configuration reference
 status: current
-summary: Every .codedoc.yml key, its default, and its effect.
+summary: Every .maat.yml key, its default, and its effect.
 related_code:
-  - internal/codedoc/config.go
+  - internal/maat/config.go
 ---
 
 # Configuration reference
 
-CodeDoc reads an optional `.codedoc.yml` at the repository root. Every key has
+Ma'at reads an optional `.maat.yml` at the repository root. Every key has
 a default, so the file may be partial or absent entirely.
 
 ```yaml
-project_name: CodeDoc
+project_name: Ma'at
 project_summary: One-line description used in generated indexes.
 
 docs_dir: docs
@@ -65,8 +65,8 @@ Each entry generates one agent-specific file, kept in sync with
 | `claude` | `CLAUDE.md` |
 | `hermes` | `.hermes.md` |
 | `copilot` | `.github/copilot-instructions.md` |
-| `cursor` | `.cursor/rules/codedoc.mdc` |
-| `windsurf` | `.windsurf/rules/codedoc.md` |
+| `cursor` | `.cursor/rules/maat.mdc` |
+| `windsurf` | `.windsurf/rules/maat.md` |
 | `gemini` | `GEMINI.md` |
 
 Remove any your team does not use; `sync` will stop generating them (delete the

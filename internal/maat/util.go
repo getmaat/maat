@@ -1,11 +1,11 @@
-// Package codedoc is the Go implementation of the CodeDoc engine: scanning a
+// Package maat is the Go implementation of the Ma'at engine: scanning a
 // docs/ tree into a model, generating derived artifacts (llms.txt, index
 // navigation, agent adapter files), and validating the set for CI.
 //
-// It is a faithful port of the reference Python implementation under codedoc/.
+// It is a faithful port of the reference Python implementation under maat/.
 // The two produce byte-identical output; the Python test suite and this
 // package's tests are the shared conformance spec.
-package codedoc
+package maat
 
 import (
 	"os"
@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-// Version is the CodeDoc CLI version. Kept in lockstep with the Python
+// Version is the Ma'at CLI version. Kept in lockstep with the Python
 // package's __version__.
 const Version = "0.1.0"
 
