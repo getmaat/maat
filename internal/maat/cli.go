@@ -184,8 +184,22 @@ func cmdInit(args []string, stdout, stderr io.Writer) (int, error) {
 	for _, rel := range result.Generated {
 		fmt.Fprintf(stdout, "  gen     %s\n", rel)
 	}
-	fmt.Fprintf(stdout, "\nMa'at initialized in %s\n"+
-		"Next: edit AGENTS.md's project overview, then run `maat check`.\n", root)
+	fmt.Fprintf(stdout, "\nMa'at initialized in %s\n", root)
+	if len(result.Skipped) > 0 {
+		// Brownfield adoption (ADR 0008): pre-existing files were preserved,
+		// so the scaffold is incomplete by design. Tell the user what that
+		// means and where the procedure for closing the gap lives.
+		fmt.Fprintf(stdout, "\n%d file(s) already existed and were left untouched (listed as `skip` above).\n"+
+			"They are yours — Ma'at never overwrites hand-written files (use --force to override).\n"+
+			"To finish adopting Ma'at in this existing repository:\n"+
+			"  1. Run `maat check` to see what the preserved files are missing.\n"+
+			"  2. Reconcile each skipped file with its scaffolded counterpart —\n"+
+			"     or let your AI agent do it: point it at %s/retrospect/SKILL.md,\n"+
+			"     which walks through deriving docs and ADRs from an existing codebase.\n"+
+			"  3. Re-run `maat check` until green, then commit.\n", len(result.Skipped), skillsRoot)
+	} else {
+		fmt.Fprint(stdout, "Next: edit AGENTS.md's project overview, then run `maat check`.\n")
+	}
 	return 0, nil
 }
 

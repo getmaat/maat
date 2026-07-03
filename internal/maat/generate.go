@@ -11,6 +11,10 @@ const (
 	endMarker   = "<!-- maat:end -->"
 )
 
+// skillsRoot is the canonical, agent-agnostic location of Ma'at-managed agent
+// skills (ADR 0007). Vendor-native skill directories receive copies.
+const skillsRoot = ".maat/skills"
+
 // splice inserts or replaces the managed region inside existing. If no markers
 // are present, the block is appended. Text outside the markers is preserved.
 func splice(existing, generated string) string {
@@ -129,4 +133,51 @@ func adapterContent(kind string, ctx adapterContext) string {
 		"{llms_rel}", ctx.llmsRel,
 	)
 	return repl.Replace(tmpl)
+}
+
+// skillVersionStamp is the version written into generated skills (ADR 0007) so
+// drift is attributable to a binary version. Development builds stamp "dev"
+// rather than their per-commit pseudo-version, so contributors regenerating
+// with source builds do not thrash the drift check.
+func skillVersionStamp() string {
+	v := Version()
+	if isDevBuild(v) {
+		return "dev"
+	}
+	return v
+}
+
+// skillContent renders one managed skill body from its embedded template
+// (ADR 0007). Skills are whole-file owned by Ma'at: sync regenerates them,
+// check flags drift, hand-edits are overwritten.
+func skillContent(def skillDef, docsDir, instructions string) string {
+	repl := strings.NewReplacer(
+		"{maat_version}", skillVersionStamp(),
+		"{docs_dir}", docsDir,
+		"{instructions}", instructions,
+	)
+	return repl.Replace(tmpl(def.tmpl))
+}
+
+// skillsBlock renders the managed skills section spliced into the instruction
+// file (ADR 0007): the agent-agnostic discovery mechanism. Any agent that
+// honors the instruction file can follow these relative links, so no native
+// skills feature is required.
+func skillsBlock(defs []skillDef) string {
+	var lines []string
+	lines = append(lines,
+		"## Skills (reusable procedures)",
+		"",
+		"Ma'at ships step-by-step procedures for recurring documentation tasks",
+		"under `"+skillsRoot+"/`. When a task matches one, read the skill file",
+		"and follow it.",
+		"")
+	for _, def := range defs {
+		lines = append(lines, "- [`"+def.name+"`]("+skillsRoot+"/"+def.name+"/SKILL.md) — "+def.desc)
+	}
+	lines = append(lines, "",
+		"These files are generated — `maat sync` regenerates them, and hand-edits",
+		"are overwritten. Team-authored skills may live alongside them and are",
+		"never touched.")
+	return strings.Join(lines, "\n")
 }

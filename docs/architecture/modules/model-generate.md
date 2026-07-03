@@ -13,8 +13,10 @@ related_code:
 ## Responsibility
 
 Turn the `docs/` tree into an in-memory model, and render every *derived*
-artifact from that model: `llms.txt`, the per-agent adapter files, and the
-managed navigation block inside `docs/index.md`.
+artifact from that model: `llms.txt`, the per-agent adapter files, the
+managed navigation block inside `docs/index.md`, and the managed agent skills
+under `.maat/skills/` (plus their vendor copies and the skills block in the
+instruction file — see [ADR 0007](../../decisions/0007-agent-skills-as-managed-artifacts.md)).
 
 ## Key files
 
@@ -26,7 +28,8 @@ managed navigation block inside `docs/index.md`.
   skipped, so they never appear in indexes or validation while remaining valid
   link targets on disk.
 - `internal/maat/generate.go` — pure rendering functions: `llmsTxt()`,
-  `indexNav()`, `adapterContent()`, plus `splice()` which inserts generated
+  `indexNav()`, `adapterContent()`, `skillContent()`/`skillsBlock()` (managed
+  agent skills, ADR 0007), plus `splice()` which inserts generated
   text between `<!-- maat:begin -->` / `<!-- maat:end -->` markers
   without disturbing hand-written content around them.
 - `internal/maat/sync.go` — `expectedArtifacts()` composes the generators
@@ -45,9 +48,11 @@ managed navigation block inside `docs/index.md`.
 
 ## Gotchas
 
-- `.mdc` (Cursor) adapters are generated **whole**, not spliced, because their
-  YAML front-matter cannot host HTML comment markers. Editing them by hand will
-  be reported as drift.
+- `.mdc` (Cursor) adapters and the skill files are generated **whole**, not
+  spliced — `.mdc` because its YAML front-matter cannot host HTML comment
+  markers, skills because they are whole-file owned by Ma'at (ADR 0007).
+  Editing either by hand will be reported as drift. Team-authored skills under
+  `.maat/skills/` with other names are never touched.
 - Adapter relative paths depend on the file's directory depth (e.g.
   `.github/copilot-instructions.md` points at `../AGENTS.md`). That math lives
   in `adapterCtx()` in `sync.go`.

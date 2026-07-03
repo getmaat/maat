@@ -33,6 +33,29 @@ var (
 	adapterMDCTemplate     = tmpl("adapter_mdc.txt")
 )
 
+// skillDef is one Ma'at-shipped agent skill (ADR 0007): a reusable procedure
+// generated to .maat/skills/<name>/SKILL.md from an embedded template, listed
+// in the instruction file's managed skills block, and fanned out to vendor
+// skill directories. Like the adapters, skills are managed artifacts: sync
+// regenerates them, check flags drift, and the content is coupled to the
+// binary version via the embedded template.
+type skillDef struct {
+	name string // directory name under .maat/skills/
+	tmpl string // embedded template filename
+	desc string // one-line trigger description for the skills block
+}
+
+// skillDefs is the ordered set of skills Ma'at ships. Order is emission order.
+var skillDefs = []skillDef{
+	{
+		name: "retrospect",
+		tmpl: "skill_retrospect.md",
+		desc: "Retrofit Ma'at documentation onto an existing repository: " +
+			"inventory gaps, interview the developer, derive documentation " +
+			"and retrospective ADRs.",
+	},
+}
+
 // scaffoldFile pairs a repo-relative destination with its template name.
 type scaffoldFile struct {
 	rel  string

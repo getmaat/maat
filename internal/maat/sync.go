@@ -75,6 +75,24 @@ func expectedArtifacts(model *DocsModel, cfg map[string]any, root string) []orde
 			artifacts = append(artifacts, orderedArtifact{target.path, splice(existing, body)})
 		}
 	}
+
+	// 4. Agent skills (ADR 0007) — canonical copies under .maat/skills/, a
+	// managed discovery block in the instruction file, and copies fanned out
+	// to vendor-native skill directories of the enabled adapters.
+	if len(skillDefs) > 0 {
+		for _, def := range skillDefs {
+			body := skillContent(def, docsDir, instructions)
+			artifacts = append(artifacts, orderedArtifact{skillsRoot + "/" + def.name + "/SKILL.md", body})
+			for _, target := range adaptersFor(cfg) {
+				if target.skillsDir == "" {
+					continue
+				}
+				artifacts = append(artifacts, orderedArtifact{target.skillsDir + "/maat-" + def.name + "/SKILL.md", body})
+			}
+		}
+		existing := readFileOrEmpty(filepath.Join(root, instructions))
+		artifacts = append(artifacts, orderedArtifact{instructions, splice(existing, skillsBlock(skillDefs))})
+	}
 	return artifacts
 }
 

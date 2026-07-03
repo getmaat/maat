@@ -8,23 +8,26 @@ import (
 	"strings"
 )
 
-// adapterTarget describes one agent adapter file: where it lives and how it is
-// rendered ("pointer" = markdown stub, "mdc" = Cursor rule with front-matter).
+// adapterTarget describes one agent adapter file: where it lives, how it is
+// rendered ("pointer" = markdown stub, "mdc" = Cursor rule with front-matter),
+// and — for agents with native skill loading — the vendor directory that
+// Ma'at-managed skills are additionally copied into (ADR 0007).
 type adapterTarget struct {
-	path  string
-	kind  string
-	label string
+	path      string
+	kind      string
+	label     string
+	skillsDir string // vendor-native skills dir, "" = no native skill support
 }
 
 // adapterTargets fans the single source of truth (AGENTS.md) out to agents that
 // insist on their own filename. Mirrors ADAPTER_TARGETS in the Python config.
 var adapterTargets = map[string]adapterTarget{
-	"claude":   {"CLAUDE.md", "pointer", "Claude Code"},
-	"hermes":   {".hermes.md", "pointer", "Hermes"},
-	"copilot":  {".github/copilot-instructions.md", "pointer", "GitHub Copilot"},
-	"cursor":   {".cursor/rules/maat.mdc", "mdc", "Cursor"},
-	"windsurf": {".windsurf/rules/maat.md", "pointer", "Windsurf"},
-	"gemini":   {"GEMINI.md", "pointer", "Gemini CLI"},
+	"claude":   {"CLAUDE.md", "pointer", "Claude Code", ".claude/skills"},
+	"hermes":   {".hermes.md", "pointer", "Hermes", ""},
+	"copilot":  {".github/copilot-instructions.md", "pointer", "GitHub Copilot", ""},
+	"cursor":   {".cursor/rules/maat.mdc", "mdc", "Cursor", ""},
+	"windsurf": {".windsurf/rules/maat.md", "pointer", "Windsurf", ""},
+	"gemini":   {"GEMINI.md", "pointer", "Gemini CLI", ""},
 }
 
 const configFilename = ".maat.yml"
@@ -151,10 +154,11 @@ func enforceVersion(cfg map[string]any) error {
 
 // resolvedAdapter is an enabled adapter with its target details.
 type resolvedAdapter struct {
-	name  string
-	path  string
-	kind  string
-	label string
+	name      string
+	path      string
+	kind      string
+	label     string
+	skillsDir string
 }
 
 // adaptersFor returns resolved adapter descriptors for the enabled adapters, in
@@ -163,7 +167,7 @@ func adaptersFor(cfg map[string]any) []resolvedAdapter {
 	var result []resolvedAdapter
 	for _, name := range toStringList(cfg["adapters"]) {
 		t := adapterTargets[name]
-		result = append(result, resolvedAdapter{name: name, path: t.path, kind: t.kind, label: t.label})
+		result = append(result, resolvedAdapter{name: name, path: t.path, kind: t.kind, label: t.label, skillsDir: t.skillsDir})
 	}
 	return result
 }

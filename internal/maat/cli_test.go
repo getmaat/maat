@@ -99,6 +99,71 @@ func TestInitIsIdempotent(t *testing.T) {
 	if !strings.Contains(out, "skip") {
 		t.Error("expected skip lines on re-init")
 	}
+	// Brownfield epilogue (ADR 0008): skips must come with guidance, not just
+	// inventory — pointing at check and the retrospect skill.
+	if !strings.Contains(out, "left untouched") || !strings.Contains(out, "retrospect/SKILL.md") {
+		t.Error("expected brownfield next-steps guidance when files were skipped")
+	}
+}
+
+// --------------------------------------------------------------------------- #
+// skills (ADR 0007)
+// --------------------------------------------------------------------------- #
+
+func TestInitScaffoldsManagedSkills(t *testing.T) {
+	root := initRepo(t)
+	canonical := readFile(t, root, ".maat/skills/retrospect/SKILL.md")
+	if !strings.Contains(canonical, "managed-by: maat") {
+		t.Error("canonical skill missing managed-by frontmatter")
+	}
+	if strings.Contains(canonical, "{docs_dir}") || strings.Contains(canonical, "{maat_version}") {
+		t.Error("skill template placeholders were not substituted")
+	}
+	// Vendor fan-out is a byte-identical copy (ADR 0007: copies, not symlinks).
+	vendor := readFile(t, root, ".claude/skills/maat-retrospect/SKILL.md")
+	if vendor != canonical {
+		t.Error("vendor skill copy differs from canonical skill")
+	}
+	// Discovery: AGENTS.md's managed region must reference the skill.
+	if !strings.Contains(readFile(t, root, "AGENTS.md"), ".maat/skills/retrospect/SKILL.md") {
+		t.Error("AGENTS.md skills block does not reference the retrospect skill")
+	}
+}
+
+func TestSkillDriftIsCaughtAndResynced(t *testing.T) {
+	root := initRepo(t)
+	// Hand-edit the managed skill: check must flag drift, sync must restore.
+	writeFile(t, root, ".maat/skills/retrospect/SKILL.md", "tampered\n")
+	out, _, code := run(t, "check", root)
+	if code != 1 {
+		t.Fatalf("check exited %d, want 1 on skill drift", code)
+	}
+	if !strings.Contains(out, ".maat/skills/retrospect/SKILL.md") {
+		t.Error("check did not report the drifted skill")
+	}
+	if _, _, code := run(t, "sync", root); code != 0 {
+		t.Fatalf("sync exited %d", code)
+	}
+	if readFile(t, root, ".maat/skills/retrospect/SKILL.md") == "tampered\n" {
+		t.Error("sync did not regenerate the tampered skill")
+	}
+	if _, _, code := run(t, "check", root); code != 0 {
+		t.Error("check not green after sync restored the skill")
+	}
+}
+
+func TestUserSkillsAreNeverTouched(t *testing.T) {
+	root := initRepo(t)
+	writeFile(t, root, ".maat/skills/team-custom/SKILL.md", "ours\n")
+	if _, _, code := run(t, "sync", root); code != 0 {
+		t.Fatalf("sync exited %d", code)
+	}
+	if readFile(t, root, ".maat/skills/team-custom/SKILL.md") != "ours\n" {
+		t.Error("sync modified a user-authored skill")
+	}
+	if _, _, code := run(t, "check", root); code != 0 {
+		t.Error("check flagged a user-authored skill")
+	}
 }
 
 func TestInitForceOverwrites(t *testing.T) {
