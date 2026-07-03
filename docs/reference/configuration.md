@@ -18,6 +18,8 @@ project_summary: One-line description used in generated indexes.
 docs_dir: docs
 instructions_file: AGENTS.md
 
+maat_version: "~> 0.1"   # optional: pin the Ma'at version this repo expects
+
 adapters:
   - claude
   - hermes
@@ -51,6 +53,7 @@ check:
 | `project_summary` | empty | One-line summary in `llms.txt` / index |
 | `docs_dir` | `docs` | Directory the docs tree lives in |
 | `instructions_file` | `AGENTS.md` | The canonical instruction file adapters point at |
+| `maat_version` | unset | Pin the Ma'at version this repo expects (see below) |
 | `adapters` | see below | Which agent adapter files `sync` generates |
 | `required_frontmatter` | `[title, status]` | Keys every doc must define |
 | `statuses` | `[current, draft, deprecated]` | Allowed `status` values |
@@ -72,6 +75,32 @@ Each entry generates one agent-specific file, kept in sync with
 Remove any your team does not use; `sync` will stop generating them (delete the
 stale file once). See
 [ADR 0003](../decisions/0003-agents-md-source-of-truth.md).
+
+## `maat_version`
+
+Optional. Pins the Ma'at version this repository expects, so every contributor
+and CI use a compatible one. When set, a **released** `maat` binary refuses to
+run `sync` or `check` (exit `2`, with an upgrade hint) unless its version
+satisfies the constraint. **Development builds** — built from source, `go run`,
+or a VCS pseudo-version — are exempt, so contributors are never blocked.
+
+The grammar is a Terraform-style subset:
+
+| Constraint | Meaning |
+|------------|---------|
+| `~> 0.1` | `>= 0.1.0, < 1.0.0` (pessimistic, two-component) |
+| `~> 0.3.1` | `>= 0.3.1, < 0.4.0` (pessimistic, three-component) |
+| `>= 0.3.0` | at least |
+| `> 0.3.0` | strictly greater |
+| `<= 0.3.0` | at most |
+| `< 0.4.0` | strictly less |
+| `= 0.3.0` / `0.3.0` | exactly |
+| `>= 0.3.0, < 0.5.0` | comma = AND (all terms must hold) |
+
+A malformed constraint fails config validation for every build (dev or
+released), so a typo surfaces immediately. Keep this value in step with the
+`MAAT_VERSION` your CI installs. See
+[ADR 0006](../decisions/0006-distribution-and-versioning.md).
 
 ## `check`
 

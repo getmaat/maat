@@ -5,6 +5,12 @@ project_summary: {{SUMMARY_INLINE}}
 docs_dir: docs
 instructions_file: AGENTS.md
 
+# Pin the Ma'at version this repo expects. When set, a released `maat` binary
+# refuses to run (exit 2) unless it satisfies the constraint, so everyone and
+# CI use a compatible version. Development builds (built from source) are
+# exempt. Terraform-style operators: "~> 0.1" means >= 0.1.0, < 1.0.0.
+# maat_version: "~> {{MAAT_VERSION}}"
+
 # Per-agent adapter files to generate and keep in sync with AGENTS.md.
 # Remove any your team does not use.
 adapters:

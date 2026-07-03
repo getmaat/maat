@@ -1,0 +1,51 @@
+# Composite GitHub Action that installs a pinned Ma'at and runs `maat check`.
+# This is the one-line, org-wide adoption primitive (see ADR 0006): every repo
+# references this Action, and the maat version is controlled centrally by the
+# `version` input — bump it in one place, or pin per-repo for reproducibility.
+#
+# Usage in a repo's workflow:
+#
+#   - uses: UemitCebi/maat@v1              # or actions/checkout of this repo
+#     with:
+#       version: 0.1.0                     # optional; defaults to latest
+#       args: --format github              # optional extra `maat check` flags
+#
+# It installs via scripts/install.sh (no Go toolchain required) and emits
+# GitHub annotations by default so findings surface inline on the PR.
+name: "Ma'at check"
+description: "Install Ma'at and validate a repository's docs-as-code set (the CI gate)."
+branding:
+  icon: "check-circle"
+  color: "blue"
+
+inputs:
+  version:
+    description: "Ma'at version to install (e.g. 0.1.0). Defaults to the latest release. Pin this to match your repo's maat_version constraint for reproducible CI."
+    required: false
+    default: ""
+  path:
+    description: "Repository root to check (the PATH argument passed to `maat check`)."
+    required: false
+    default: "."
+  args:
+    description: "Extra flags appended to `maat check` (e.g. --strict). --format github is added automatically."
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Ma'at
+      shell: bash
+      env:
+        MAAT_VERSION: ${{ inputs.version }}
+        # Install into a dir already on PATH for GitHub-hosted runners.
+        MAAT_INSTALL_DIR: /usr/local/bin
+      run: |
+        curl -sSf https://raw.githubusercontent.com/UemitCebi/maat/main/scripts/install.sh | sh
+        maat --version
+
+    - name: Run maat check
+      shell: bash
+      run: |
+        maat check --format github ${{ inputs.args }} "${{ inputs.path }}"

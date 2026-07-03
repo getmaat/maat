@@ -5,6 +5,10 @@ project_summary: A documentation-as-code framework that keeps a repository's doc
 docs_dir: docs
 instructions_file: AGENTS.md
 
+# This repo dogfoods its own version pin. A released `maat` must satisfy this
+# constraint to run here; source builds are exempt (see ADR 0006).
+maat_version: "~> 0.1"
+
 # Per-agent adapter files to generate and keep in sync with AGENTS.md.
 # Remove any your team does not use.
 adapters:

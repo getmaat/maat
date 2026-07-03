@@ -1,0 +1,52 @@
+# Reusable workflow: install a pinned Ma'at and run the docs-as-code gate.
+# Orgs with many repos call this with `workflow_call` so the whole check job —
+# runner, checkout, install, flags — is maintained in ONE place. Bump the
+# default `maat_version` here and every caller inherits it on its next run.
+# See ADR 0006 and docs/guides/deployment.md.
+#
+# Caller (in another repo, .github/workflows/docs.yml):
+#
+#   name: docs
+#   on:
+#     pull_request:
+#     push:
+#       branches: [main]
+#   jobs:
+#     maat:
+#       uses: UemitCebi/maat/.github/workflows/maat-check.yml@v1
+#       with:
+#         maat_version: "0.1.0"   # optional; pin for reproducibility
+name: maat-check
+
+on:
+  workflow_call:
+    inputs:
+      maat_version:
+        description: "Ma'at version to install. Empty = latest release."
+        type: string
+        required: false
+        default: ""
+      path:
+        description: "Repository root to check."
+        type: string
+        required: false
+        default: "."
+      strict:
+        description: "Pass --strict (promote staleness warnings to errors)."
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ma'at check
+        uses: UemitCebi/maat@v1
+        with:
+          version: ${{ inputs.maat_version }}
+          path: ${{ inputs.path }}
+          args: ${{ inputs.strict && '--strict' || '' }}

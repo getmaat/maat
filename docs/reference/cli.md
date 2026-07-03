@@ -62,4 +62,4 @@ list.
 |------|---------|
 | `0` | Success — no error-severity findings |
 | `1` | Validation failed — at least one error-severity finding |
-| `2` | Usage/configuration error (e.g. no `docs/` directory, bad arguments) |
+| `2` | Usage/configuration error (e.g. no `docs/` directory, bad arguments, or a released binary that does not satisfy the repo's [`maat_version`](configuration.md#maat_version) constraint) |

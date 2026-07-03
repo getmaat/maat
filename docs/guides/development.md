@@ -6,6 +6,9 @@ related_code:
   - .goreleaser.yaml
   - .github/workflows/release.yml
   - scripts/render-homebrew-formula.sh
+  - scripts/install.sh
+  - action.yml
+  - .github/workflows/maat-check.yml
 ---
 
 # Development guide
@@ -50,6 +53,12 @@ go test ./...                  # run the tests
 ```
 
 Both `check` and the tests must be green before you open a pull request.
+
+This repository pins `maat_version: "~> 0.1"` in its own `.maat.yml` (it
+dogfoods the feature). Source builds — `go run .`, `go build`, or a
+pseudo-versioned binary — are **exempt** from that pin, so it never blocks your
+local loop; enforcement applies only to released binaries. See
+[ADR 0006](../decisions/0006-distribution-and-versioning.md).
 
 ## Releasing
 
@@ -116,6 +125,23 @@ scripts/render-homebrew-formula.sh 0.1.0 dist/checksums.txt
 A true bare `brew install maat` (no tap) would require acceptance into
 homebrew-core, which has a notability bar and ongoing-maintenance obligations —
 revisit once the project has traction.
+
+### Install script and GitHub Action
+
+Two more distribution artifacts ride on the same GoReleaser output and are
+maintained in this repo (see
+[ADR 0006](../decisions/0006-distribution-and-versioning.md)):
+
+- [`scripts/install.sh`](../../scripts/install.sh) — the universal `curl | sh`
+  installer. It downloads the `maat_<version>_<os>_<arch>.tar.gz` archive and
+  verifies it against `checksums.txt`, so it depends on GoReleaser's archive
+  and checksum **naming** staying stable. That same contract is shared by the
+  Homebrew renderer, so treat the name template in `.goreleaser.yaml` as an API.
+- [`action.yml`](../../action.yml) (composite action) and
+  [`.github/workflows/maat-check.yml`](../../.github/workflows/maat-check.yml)
+  (reusable workflow) — both install through `install.sh`, so there is one
+  install code path to maintain. They are versioned by a moving major tag
+  (`v1`) that consumers reference as `UemitCebi/maat@v1`.
 
 ## Coding conventions
 

@@ -18,6 +18,7 @@ Copy [`_template.md`](_template.md) to `NNNN-short-title.md` (next number).
 
 Newest first:
 
+- [0006 Distribution and version pinning](0006-distribution-and-versioning.md)
 - [0005 Rewrite the CLI in Go, distribute a single static binary](0005-go-rewrite.md)
 - [0004 Detect staleness via related_code timestamps](0004-related-code-staleness.md)
 - [0003 AGENTS.md as the source of truth, with generated adapters](0003-agents-md-source-of-truth.md)

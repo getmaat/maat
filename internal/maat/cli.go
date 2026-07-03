@@ -199,6 +199,9 @@ func cmdSync(args []string, stdout, stderr io.Writer) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	if err := enforceVersion(cfg); err != nil {
+		return 0, err
+	}
 	changed, err := RunSync(root, cfg)
 	if err != nil {
 		return 0, err
@@ -222,6 +225,9 @@ func cmdCheck(args []string, stdout, stderr io.Writer) (int, error) {
 	root := absRoot(p.path)
 	cfg, err := LoadConfig(root)
 	if err != nil {
+		return 0, err
+	}
+	if err := enforceVersion(cfg); err != nil {
 		return 0, err
 	}
 	if p.strict {

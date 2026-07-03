@@ -112,7 +112,41 @@ func validateConfig(cfg map[string]any) error {
 	if staleness != "off" && staleness != "warn" && staleness != "error" {
 		return fmt.Errorf("check.staleness must be off|warn|error, got %s", pyRepr(staleness))
 	}
+	// maat_version is optional; when present it must be a well-formed
+	// constraint so a typo fails fast for every build (including dev builds
+	// that are otherwise exempt from enforcement — see ADR 0006).
+	if v, ok := cfg["maat_version"]; ok && truthy(v) {
+		if _, err := parseConstraint(AnyToStr(v)); err != nil {
+			return fmt.Errorf("invalid maat_version constraint: %w", err)
+		}
+	}
 	return nil
+}
+
+// enforceVersion applies the optional `maat_version` constraint to the running
+// binary (ADR 0006). It returns a non-nil error when a real release binary
+// fails to satisfy the repo's declared constraint; the caller turns that into
+// an exit-2 configuration error with an upgrade hint. Development builds
+// (source, `go run`, VCS pseudo-versions) are exempt so contributors are never
+// blocked — the constraint governs released binaries, which are what teams and
+// CI pin. The constraint syntax was already validated in validateConfig, so a
+// parse error here is treated as unenforced rather than re-reported.
+func enforceVersion(cfg map[string]any) error {
+	v, ok := cfg["maat_version"]
+	if !ok || !truthy(v) {
+		return nil
+	}
+	constraint := AnyToStr(v)
+	enforced, satisfied, err := checkVersionConstraint(Version(), constraint)
+	if err != nil || !enforced || satisfied {
+		return nil
+	}
+	return fmt.Errorf(
+		"this repository requires maat %s but you are running %s.\n"+
+			"Upgrade: `brew upgrade maat`, re-run the install script, or "+
+			"`go install github.com/UemitCebi/maat@latest`.\n"+
+			"To change the requirement, edit `maat_version` in %s.",
+		constraint, Version(), configFilename)
 }
 
 // resolvedAdapter is an enabled adapter with its target details.

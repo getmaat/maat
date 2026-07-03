@@ -64,6 +64,19 @@ var scaffoldFiles = []scaffoldFile{
 	{".github/workflows/maat.yml", "workflow.yml"},
 }
 
+// scaffoldVersionPin returns the value stamped into the scaffolded CI
+// workflow's MAAT_VERSION. A real release binary pins its own exact version so
+// generated CI is reproducible and matches the tool that wrote it; a
+// development build leaves it empty, meaning "track the latest release" (we
+// can't pin a dev build users can't install). See ADR 0006.
+func scaffoldVersionPin() string {
+	v := Version()
+	if isDevBuild(v) {
+		return ""
+	}
+	return v
+}
+
 func fill(text string, subs map[string]string) string {
 	// Longest keys first so {{SUMMARY_INLINE}} is not partially matched by
 	// {{SUMMARY}}. Go maps are unordered, so sort explicitly.
@@ -103,6 +116,7 @@ func RunInit(root, project, summary string, force bool) (*InitResult, error) {
 		"DATE":           time.Now().Format("2006-01-02"),
 		"NAME":           "example",
 		"PATH":           "src/example",
+		"MAAT_VERSION":   scaffoldVersionPin(),
 	}
 
 	result := &InitResult{}

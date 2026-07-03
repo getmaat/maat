@@ -12,20 +12,29 @@ into a repository. This guide covers rolling it out.
 ## 1. Get the tool
 
 Ma'at is a single static binary with no runtime dependencies (see
-[ADR 0005](../decisions/0005-go-rewrite.md)). Obtain it either way:
+[ADR 0005](../decisions/0005-go-rewrite.md)), so it drops onto any machine or CI
+runner regardless of the language your project is written in. Pick whichever
+channel fits:
 
 ```bash
-# Build from source (requires Go 1.24+):
-go build -o maat .
-# …then move ./maat onto your PATH.
+# Universal installer (macOS/Linux, no toolchain required):
+curl -sSf https://raw.githubusercontent.com/UemitCebi/maat/main/scripts/install.sh | sh
 
-# Or run without installing, from a clone of this repo:
-go run . <command>
+# Pin an exact version (recommended for CI — see step 4):
+curl -sSf https://raw.githubusercontent.com/UemitCebi/maat/main/scripts/install.sh | MAAT_VERSION=0.1.0 sh
+
+# Homebrew:
+brew install UemitCebi/tap/maat
+
+# Go toolchain:
+go install github.com/UemitCebi/maat@latest
 ```
 
-A prebuilt binary can be committed to the target repo or fetched in CI; because
-it is statically linked, no interpreter or package manager is required on the
-machine that runs it.
+The installer detects your OS/arch, downloads the matching release archive,
+**verifies its sha256 checksum**, and installs to `/usr/local/bin` (or
+`$HOME/.local/bin` if that is not writable; override with `MAAT_INSTALL_DIR`).
+Because the binary is statically linked, no interpreter or package manager is
+required on the machine that runs it.
 
 ## 2. Scaffold the docs
 
@@ -46,18 +55,56 @@ clone).
 
 ## 4. Wire up CI
 
-The generated [`.github/workflows/maat.yml`](../../.github/workflows/maat.yml)
-builds the binary and runs `maat check` on every pull request. For non-GitHub
-CI, run the same command:
+CI is the authority: a required `maat check` job is what actually blocks a merge
+on documentation drift (see
+[ADR 0006](../decisions/0006-distribution-and-versioning.md)). The generated
+[`.github/workflows/maat.yml`](../../.github/workflows/maat.yml) installs the
+binary via the universal script and runs `maat check` on every pull request.
+
+On GitHub, the shortest wiring is the published composite action:
+
+```yaml
+- uses: UemitCebi/maat@v1
+  with:
+    version: "0.1.0"   # optional; omit to track the latest release
+```
+
+An org with many repos can instead call the reusable workflow so the runner,
+checkout, and flags live in one place:
+
+```yaml
+jobs:
+  maat:
+    uses: UemitCebi/maat/.github/workflows/maat-check.yml@v1
+    with:
+      maat_version: "0.1.0"
+```
+
+For non-GitHub CI, install the binary and run the same command:
 
 ```bash
+curl -sSf https://raw.githubusercontent.com/UemitCebi/maat/main/scripts/install.sh | MAAT_VERSION=0.1.0 sh
 maat check --format text
 ```
 
 Make the job **required** so documentation drift blocks a merge, mirroring how
 a failing test does.
 
-## 5. Establish the habit
+## 5. Pin the version
+
+To keep every contributor and CI on a compatible tool, declare the version your
+repo expects in `.maat.yml`:
+
+```yaml
+maat_version: "~> 0.1"
+```
+
+A released binary that does not satisfy the constraint refuses to run (exit
+`2`) with an upgrade hint; source builds are exempt. Keep this in step with the
+`MAAT_VERSION` your CI installs. The full grammar is in the
+[configuration reference](../reference/configuration.md#maat_version).
+
+## 6. Establish the habit
 
 From here, the [update protocol](../../AGENTS.md) does the work: every change
 that touches code updates its docs in the same PR, `maat sync` regenerates
