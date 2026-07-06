@@ -2,7 +2,6 @@
 
 [![CI](https://github.com/getmaat/maat/actions/workflows/maat.yml/badge.svg)](https://github.com/getmaat/maat/actions/workflows/maat.yml)
 [![Release](https://img.shields.io/github/v/release/getmaat/maat)](https://github.com/getmaat/maat/releases/latest)
-[![Go Report Card](https://goreportcard.com/badge/github.com/getmaat/maat)](https://goreportcard.com/report/github.com/getmaat/maat)
 [![License](https://img.shields.io/github/license/getmaat/maat)](LICENSE)
 
 **Documentation-as-code for humans _and_ AI agents.**
