@@ -161,7 +161,11 @@ func flagValue(args []string, i int) (string, int, error) {
 	return args[i+1], i + 1, nil
 }
 
-func cmdInit(args []string, stdout, stderr io.Writer) (int, error) {
+// cmdInit's (int, error) signature matches cmdSync/cmdCheck so Main can
+// dispatch to all three uniformly; init has no non-zero success exit code.
+//
+//nolint:unparam
+func cmdInit(args []string, stdout, _ io.Writer) (int, error) {
 	p, err := parseArgs("init", args)
 	if err != nil {
 		return 0, err
@@ -203,7 +207,10 @@ func cmdInit(args []string, stdout, stderr io.Writer) (int, error) {
 	return 0, nil
 }
 
-func cmdSync(args []string, stdout, stderr io.Writer) (int, error) {
+// See cmdInit for why this always returns 0 on success.
+//
+//nolint:unparam
+func cmdSync(args []string, stdout, _ io.Writer) (int, error) {
 	p, err := parseArgs("sync", args)
 	if err != nil {
 		return 0, err

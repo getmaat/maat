@@ -148,7 +148,7 @@ func enforceVersion(cfg map[string]any) error {
 		"this repository requires maat %s but you are running %s.\n"+
 			"Upgrade: `brew upgrade maat`, re-run the install script, or "+
 			"`go install github.com/getmaat/maat@latest`.\n"+
-			"To change the requirement, edit `maat_version` in %s.",
+			"To change the requirement, edit `maat_version` in %s",
 		constraint, Version(), configFilename)
 }
 

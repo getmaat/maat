@@ -40,9 +40,7 @@ func fmSplit(text string) (map[string]any, string, error) {
 	}
 	rawMeta := strings.Join(lines[1:closing], "\n")
 	body := strings.Join(lines[closing+1:], "\n")
-	if strings.HasPrefix(body, "\n") {
-		body = body[1:]
-	}
+	body = strings.TrimPrefix(body, "\n")
 	var meta any = map[string]any{}
 	if strings.TrimSpace(rawMeta) != "" {
 		parsed, err := yamlParse(rawMeta)

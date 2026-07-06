@@ -124,10 +124,6 @@ func ScanModel(root, docsDir string) (*DocsModel, error) {
 	}
 	// Collect files first so we can walk directories in the same order Python's
 	// os.walk yields them, sorting filenames within each directory.
-	type entry struct {
-		dir   string
-		names []string
-	}
 	dirs := map[string][]string{}
 	var dirOrder []string
 	err = filepath.WalkDir(model.DocsPath, func(path string, d fs.DirEntry, err error) error {
