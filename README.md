@@ -1,5 +1,10 @@
 # Ma'at
 
+[![CI](https://github.com/getmaat/maat/actions/workflows/maat.yml/badge.svg)](https://github.com/getmaat/maat/actions/workflows/maat.yml)
+[![Release](https://img.shields.io/github/v/release/getmaat/maat)](https://github.com/getmaat/maat/releases/latest)
+[![Go Report Card](https://goreportcard.com/badge/github.com/getmaat/maat)](https://goreportcard.com/report/github.com/getmaat/maat)
+[![License](https://img.shields.io/github/license/getmaat/maat)](LICENSE)
+
 **Documentation-as-code for humans _and_ AI agents.**
 
 Ma'at keeps three things in lockstep — a repository's `docs/` tree, its
@@ -26,6 +31,23 @@ Two problems, one solution:
    diverge. Ma'at makes **`AGENTS.md` the single source of truth** and
    *generates* every other agent's file from it, verifying they never drift.
 
+## Install
+
+```bash
+# Homebrew (macOS + Linuxbrew)
+brew install getmaat/tap/maat
+
+# Install script (no Go toolchain required)
+curl -sSf https://raw.githubusercontent.com/getmaat/maat/main/scripts/install.sh | sh
+
+# Go
+go install github.com/getmaat/maat@latest
+```
+
+Or drop the [`getmaat/maat`](action.yml) GitHub Action into CI to run `maat
+check` on every pull request — see
+[`docs/guides/deployment.md`](docs/guides/deployment.md).
+
 ## How it works
 
 ```
@@ -47,8 +69,7 @@ Two problems, one solution:
 
 ## The CLI
 
-A single static binary with zero runtime dependencies. Build it with Go 1.24+,
-or run it straight from a clone:
+A single static binary with zero runtime dependencies.
 
 ```bash
 maat init .     # scaffold docs/, AGENTS.md, config, CI, adapters
@@ -56,9 +77,11 @@ maat sync       # regenerate llms.txt + adapters + index nav
 maat check      # validate docs; non-zero exit fails CI
 ```
 
+Running from a clone without installing:
+
 ```bash
 go build -o maat .   # produce the binary
-go run . <command>      # or run without installing
+go run . <command>   # or run without building
 ```
 
 | Command | Does |
@@ -94,6 +117,12 @@ This repository dogfoods itself — its own docs are built with Ma'at. Start at
 A change is not complete until its docs are updated in the same change. See
 [`AGENTS.md`](AGENTS.md) for the full protocol every contributor — human or
 agent — follows.
+
+## Contributing
+
+Bug reports, feature requests, and pull requests are welcome — see
+[`CONTRIBUTING.md`](CONTRIBUTING.md) for dev setup and the docs-update
+protocol every change follows.
 
 ## License
 
