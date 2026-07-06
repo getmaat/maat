@@ -54,6 +54,8 @@ changelog:
       - "^docs:"
       - "^test:"
       - "^chore:"
+      - "^Merge pull request"
+      - "^Merge branch"
 
 release:
   github:
