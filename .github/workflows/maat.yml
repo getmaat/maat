@@ -1,6 +1,7 @@
 name: Ma'at
 
-# Validates that documentation stayed in sync with code on every pull request.
+# Validates every pull request: docs stayed in sync (the CI gate this project
+# dogfoods), the Go test suite passes, and golangci-lint is clean.
 on:
   pull_request:
   push:
@@ -18,3 +19,25 @@ jobs:
         run: go build -o "$RUNNER_TEMP/maat" .
       - name: Run maat check
         run: '"$RUNNER_TEMP/maat" check --format github'
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+      - name: go test
+        run: go test ./...
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest

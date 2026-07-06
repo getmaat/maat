@@ -2,6 +2,9 @@
 title: Testing guide
 status: current
 summary: How to run and write Ma'at's tests, and what CI enforces.
+related_code:
+  - .github/workflows/maat.yml
+  - .golangci.yml
 ---
 
 # Testing guide
@@ -20,16 +23,23 @@ The tests exercise the CLI end to end against temporary directories: they run
 ## What CI enforces
 
 The [`Ma'at` workflow](../../.github/workflows/maat.yml) runs on every pull
-request and push to the main branch. It builds the binary and runs:
+request and push to the main branch, as three independent jobs:
+
+- **check** — builds the binary and runs `maat check --format github`. A merge
+  is blocked if `check` reports any error-severity finding — stale docs,
+  broken internal links, missing `related_code` targets, or drifted generated
+  files. Fix them by updating the relevant doc and running `maat sync`.
+- **test** — runs `go test ./...`.
+- **lint** — runs [`golangci-lint`](https://golangci-lint.run) against the
+  config in [`.golangci.yml`](../../.golangci.yml).
+
+Run all three locally before opening a pull request:
 
 ```bash
-go build -o maat .
-./maat check --format github
+go run . check
+go test ./...
+golangci-lint run ./...   # go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 ```
-
-A merge is blocked if `check` reports any error-severity finding — stale docs,
-broken internal links, missing `related_code` targets, or drifted generated
-files. Fix them by updating the relevant doc and running `maat sync`.
 
 ## Writing tests
 

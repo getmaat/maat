@@ -49,10 +49,13 @@ A normal change loop:
 # 2. update the matching doc(s) — see AGENTS.md "update protocol"
 go run . sync      # regenerate derived files if docs changed
 go run . check     # validate docs (the CI gate)
-go test ./...                  # run the tests
+go test ./...      # run the tests
+golangci-lint run ./...   # lint (see docs/guides/testing.md)
 ```
 
-Both `check` and the tests must be green before you open a pull request.
+`check`, the tests, and the lint must all be green before you open a pull
+request — CI runs all three as separate jobs (see
+[testing guide](testing.md)).
 
 This repository pins `maat_version: "~> 0.1"` in its own `.maat.yml` (it
 dogfoods the feature). Source builds — `go run .`, `go build`, or a

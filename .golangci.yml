@@ -1,0 +1,16 @@
+version: "2"
+
+linters:
+  default: standard
+  enable:
+    - unconvert
+    - unparam
+  settings:
+    errcheck:
+      # Writes to the CLI's own stdout/stderr are not worth checking: on
+      # failure there is nowhere better to report it, and the exit code
+      # already reflects command success/failure.
+      exclude-functions:
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln

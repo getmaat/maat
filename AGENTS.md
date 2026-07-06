@@ -113,10 +113,13 @@ go run . sync
 
 # Run the test suite:
 go test ./...
+
+# Lint (see docs/guides/testing.md):
+golangci-lint run ./...
 ```
 
-Before declaring any change done: run `go run . check` **and**
-`go test ./...`, and make sure both are green.
+Before declaring any change done: run `go run . check`, `go test ./...`, and
+`golangci-lint run ./...`, and make sure all three are green.
 
 ## Human approval
 
