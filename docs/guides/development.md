@@ -108,13 +108,20 @@ binary, whereas a formula installs the binary cleanly on both platforms.
 
 The formula is regenerated on every release by
 [`scripts/render-homebrew-formula.sh`](../../scripts/render-homebrew-formula.sh),
-which reads the version and `dist/checksums.txt` that GoReleaser produced and
-prints the formula to stdout (it is pure — no network, no side effects). The
-`release` workflow runs it and pushes the result to the tap. This is wired as a
-custom step instead of GoReleaser's deprecated `brews:` block (which now emits a
-Cask). Publishing requires a `HOMEBREW_TAP_TOKEN` repository secret on `maat` —
-a token with push access to the tap repo; if it is unset, the step is skipped
-with a warning and the GitHub Release still succeeds.
+which reads the version and a `checksums.txt` and prints the formula to stdout
+(it is pure — no network, no side effects). The `release` workflow runs it in a
+**separate `homebrew-tap` job** (`needs: goreleaser`) that downloads
+`checksums.txt` back from the published GitHub Release, so the tap update is
+independently re-runnable: if it fails (e.g. a bad token), `gh run rerun
+--failed` re-runs only that job against the release that already exists, rather
+than GoReleaser erroring on duplicate asset uploads. This is wired as a custom
+job instead of GoReleaser's deprecated `brews:` block (which now emits a Cask).
+Publishing requires a `HOMEBREW_TAP_TOKEN` repository secret on `maat` — a token
+with push access to the tap repo; if it is unset, the job is skipped with a
+warning and the GitHub Release still succeeds. Note the token's **identity**
+must retain push access to the tap: after an org transfer, a token owned by a
+user who no longer has access fails with `403 Permission denied` even though the
+secret carried over — re-issue it scoped to the new owner.
 
 To preview or regenerate the formula locally:
 

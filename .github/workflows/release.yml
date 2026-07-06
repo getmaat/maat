@@ -1,8 +1,16 @@
 name: release
 
-# Cut a release when a semver tag is pushed. GoReleaser cross-compiles the
-# binaries, builds the archives + checksums, and publishes the GitHub Release.
-# A follow-up step regenerates the Homebrew formula and pushes it to the tap.
+# Cut a release when a semver tag is pushed. The `goreleaser` job
+# cross-compiles the binaries, builds the archives + checksums, and publishes
+# the GitHub Release. The separate `homebrew-tap` job then regenerates the
+# Homebrew formula and pushes it to the tap.
+#
+# The two are DELIBERATELY separate jobs (not steps in one): the tap job reads
+# checksums.txt from the *published Release*, not from the goreleaser job's
+# local dist/. That makes it independently re-runnable — if the tap push fails
+# (e.g. a bad token), `gh run rerun --failed` re-runs only this job against the
+# release that already exists, instead of GoReleaser erroring on duplicate
+# asset uploads (422 already_exists). See ADR 0006.
 on:
   push:
     tags:
@@ -34,14 +42,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Publish a cross-platform Homebrew *formula* (macOS + Linuxbrew, no
-      # Gatekeeper quarantine) to getmaat/homebrew-tap. Uses the checksums
-      # GoReleaser just wrote to dist/checksums.txt. Skips gracefully if the
-      # HOMEBREW_TAP_TOKEN secret is not configured, so the GitHub Release is
-      # never blocked on it.
+  # Publish a cross-platform Homebrew *formula* (macOS + Linuxbrew, no
+  # Gatekeeper quarantine) to getmaat/homebrew-tap. Runs after the release is
+  # published and reads checksums.txt back FROM the Release, so it is safe to
+  # re-run on its own. Skips gracefully if HOMEBREW_TAP_TOKEN is unset, so the
+  # GitHub Release is never blocked on it.
+  homebrew-tap:
+    needs: goreleaser
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Update Homebrew tap formula
         env:
           HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          # GH_TOKEN lets `gh release download` read this repo's Release.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ -z "${HOMEBREW_TAP_TOKEN}" ]; then
             echo "::warning::HOMEBREW_TAP_TOKEN not set — skipping Homebrew formula update."
@@ -49,7 +66,15 @@ jobs:
           fi
 
           VERSION="${GITHUB_REF_NAME#v}"
-          ./scripts/render-homebrew-formula.sh "$VERSION" dist/checksums.txt > /tmp/maat.rb
+
+          # Pull checksums.txt from the published Release (not a local dist/),
+          # so this job stands alone and re-runs cleanly.
+          gh release download "${GITHUB_REF_NAME}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --pattern checksums.txt \
+            --dir /tmp
+
+          ./scripts/render-homebrew-formula.sh "$VERSION" /tmp/checksums.txt > /tmp/maat.rb
 
           git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/getmaat/homebrew-tap.git" /tmp/tap
           mkdir -p /tmp/tap/Formula
