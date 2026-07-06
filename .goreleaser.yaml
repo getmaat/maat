@@ -19,7 +19,7 @@ builds:
     ldflags:
       # Inject the release version into the engine package. Matches the
       # resolution in internal/maat/util.go (var version).
-      - -s -w -X github.com/UemitCebi/maat/internal/maat.version={{ .Version }}
+      - -s -w -X github.com/getmaat/maat/internal/maat.version={{ .Version }}
     goos:
       - linux
       - darwin
@@ -57,7 +57,7 @@ changelog:
 
 release:
   github:
-    owner: UemitCebi
+    owner: getmaat
     name: maat
   draft: false
   prerelease: auto

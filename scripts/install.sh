@@ -4,7 +4,7 @@
 # distribution primitive that the GitHub Action and CI template build on
 # (see ADR 0006 and docs/guides/deployment.md).
 #
-#   curl -sSf https://raw.githubusercontent.com/UemitCebi/maat/main/scripts/install.sh | sh
+#   curl -sSf https://raw.githubusercontent.com/getmaat/maat/main/scripts/install.sh | sh
 #
 # Options are read from the environment so the one-liner stays clean:
 #   MAAT_VERSION   version to install, with or without leading 'v'
@@ -20,7 +20,7 @@
 # stock macOS or Linux CI image: curl or wget, tar, and sha256sum or shasum.
 set -eu
 
-REPO="UemitCebi/maat"
+REPO="getmaat/maat"
 BINARY="maat"
 
 # --------------------------------------------------------------------------- #

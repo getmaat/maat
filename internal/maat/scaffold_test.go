@@ -58,7 +58,7 @@ func TestScaffoldedWorkflowPinsReleaseRefs(t *testing.T) {
 
 	for _, want := range []string{
 		`MAAT_VERSION: "0.2.0"`,
-		"UemitCebi/maat@v0.2.0",
+		"getmaat/maat@v0.2.0",
 		"maat-check.yml@v0.2.0",
 	} {
 		if !strings.Contains(wf, want) {
@@ -86,7 +86,7 @@ func TestScaffoldedWorkflowDevBuildTracksLatest(t *testing.T) {
 	if !strings.Contains(wf, `MAAT_VERSION: ""`) {
 		t.Errorf("dev-build workflow should leave MAAT_VERSION empty\n---\n%s", wf)
 	}
-	if !strings.Contains(wf, "UemitCebi/maat@vX.Y.Z") {
+	if !strings.Contains(wf, "getmaat/maat@vX.Y.Z") {
 		t.Errorf("dev-build workflow should render the vX.Y.Z placeholder\n---\n%s", wf)
 	}
 	// Guard against the old bug: an empty ref substitution rendering "@v\n".

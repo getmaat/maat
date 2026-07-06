@@ -50,7 +50,7 @@ The canonical way to adopt Ma'at is a CI job that installs a pinned binary and
 runs `maat check`. We ship two ready-made entry points so a repo needs one
 line, not a hand-rolled job:
 
-- A **composite GitHub Action** (`action.yml`) — `uses: UemitCebi/maat@v0.2.0`
+- A **composite GitHub Action** (`action.yml`) — `uses: getmaat/maat@v0.2.0`
   with an optional `version` input.
 - A **reusable workflow** (`.github/workflows/maat-check.yml`) callable via
   `workflow_call`, so an org maintains the runner/checkout/flags in one place
@@ -65,7 +65,7 @@ surface inline on the PR.
 else:
 
 ```sh
-curl -sSf https://raw.githubusercontent.com/UemitCebi/maat/main/scripts/install.sh | sh
+curl -sSf https://raw.githubusercontent.com/getmaat/maat/main/scripts/install.sh | sh
 ```
 
 It is POSIX `sh` (no bashisms), detects OS/arch, downloads the matching

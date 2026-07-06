@@ -82,24 +82,24 @@ reports the VCS pseudo-version instead (see `Version()` in `util.go`). Tags
 must be `vMAJOR.MINOR.PATCH`; pre-release tags (`v0.2.0-rc1`) are published as
 GitHub pre-releases automatically.
 
-Once a tag is pushed, `go install github.com/UemitCebi/maat@latest` resolves it
+Once a tag is pushed, `go install github.com/getmaat/maat@latest` resolves it
 through the Go module proxy.
 
 ### Homebrew
 
 Ma'at is distributed through a personal tap,
-[`UemitCebi/homebrew-tap`](https://github.com/UemitCebi/homebrew-tap):
+[`getmaat/homebrew-tap`](https://github.com/getmaat/homebrew-tap):
 
 ```bash
-brew install UemitCebi/tap/maat
+brew install getmaat/tap/maat
 ```
 
 This fully-qualified form installs without a prompt: naming the tap on the
 command line satisfies Homebrew 6.0+'s tap-trust check. The safeguard only
 triggers when the tap is *not* named on the command line — e.g. the short-name
-flow (`brew tap UemitCebi/tap` then `brew install maat`), which fails with
+flow (`brew tap getmaat/tap` then `brew install maat`), which fails with
 `Refusing to load formula … from untrusted tap` until the user runs
-`brew trust UemitCebi/tap` (stored per-machine in `~/.homebrew/trust.json`).
+`brew trust getmaat/tap` (stored per-machine in `~/.homebrew/trust.json`).
 
 The tap holds a cross-platform **formula** (`Formula/maat.rb`) that installs the
 pre-built binary on both macOS and Linuxbrew. A formula — rather than a Cask — is
@@ -141,7 +141,7 @@ maintained in this repo (see
   [`.github/workflows/maat-check.yml`](../../.github/workflows/maat-check.yml)
   (reusable workflow) — both install through `install.sh`, so there is one
   install code path to maintain. Consumers pin them to an exact release tag
-  (e.g. `UemitCebi/maat@v0.2.0`); a moving major-version pointer (`@v1`) is
+  (e.g. `getmaat/maat@v0.2.0`); a moving major-version pointer (`@v1`) is
   deferred until 1.0, so it cannot collide with the semver release trigger.
 
 ## Coding conventions

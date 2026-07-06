@@ -15,7 +15,7 @@ import (
 )
 
 // version is the release version, injected at build time by GoReleaser via
-// -ldflags "-X github.com/UemitCebi/maat/internal/maat.version=<tag>". It is
+// -ldflags "-X github.com/getmaat/maat/internal/maat.version=<tag>". It is
 // empty for non-release builds.
 var version = ""
 

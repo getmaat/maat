@@ -22,14 +22,14 @@ jobs:
         env:
           MAAT_VERSION: "{{MAAT_VERSION}}"
           MAAT_INSTALL_DIR: /usr/local/bin
-        run: curl -sSf https://raw.githubusercontent.com/UemitCebi/maat/main/scripts/install.sh | sh
+        run: curl -sSf https://raw.githubusercontent.com/getmaat/maat/main/scripts/install.sh | sh
 
       - name: Run maat check
         run: maat check --format github
 
 # Alternatively, replace the two steps above with the published composite action:
 #
-#   - uses: UemitCebi/maat@{{MAAT_ACTION_REF}}
+#   - uses: getmaat/maat@{{MAAT_ACTION_REF}}
 #     with:
 #       version: "{{MAAT_VERSION}}"   # optional; empty = latest
 #
@@ -37,6 +37,6 @@ jobs:
 #
 #   jobs:
 #     maat:
-#       uses: UemitCebi/maat/.github/workflows/maat-check.yml@{{MAAT_ACTION_REF}}
+#       uses: getmaat/maat/.github/workflows/maat-check.yml@{{MAAT_ACTION_REF}}
 #       with:
 #         maat_version: "{{MAAT_VERSION}}"

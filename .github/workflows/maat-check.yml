@@ -13,7 +13,7 @@
 #       branches: [main]
 #   jobs:
 #     maat:
-#       uses: UemitCebi/maat/.github/workflows/maat-check.yml@v1
+#       uses: getmaat/maat/.github/workflows/maat-check.yml@v1
 #       with:
 #         maat_version: "0.1.0"   # optional; pin for reproducibility
 name: maat-check
@@ -45,7 +45,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Ma'at check
-        uses: UemitCebi/maat@v1
+        uses: getmaat/maat@v1
         with:
           version: ${{ inputs.maat_version }}
           path: ${{ inputs.path }}

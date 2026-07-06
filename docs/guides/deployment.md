@@ -18,16 +18,16 @@ channel fits:
 
 ```bash
 # Universal installer (macOS/Linux, no toolchain required):
-curl -sSf https://raw.githubusercontent.com/UemitCebi/maat/main/scripts/install.sh | sh
+curl -sSf https://raw.githubusercontent.com/getmaat/maat/main/scripts/install.sh | sh
 
 # Pin an exact version (recommended for CI — see step 4):
-curl -sSf https://raw.githubusercontent.com/UemitCebi/maat/main/scripts/install.sh | MAAT_VERSION=0.2.0 sh
+curl -sSf https://raw.githubusercontent.com/getmaat/maat/main/scripts/install.sh | MAAT_VERSION=0.2.0 sh
 
 # Homebrew:
-brew install UemitCebi/tap/maat
+brew install getmaat/tap/maat
 
 # Go toolchain:
-go install github.com/UemitCebi/maat@latest
+go install github.com/getmaat/maat@latest
 ```
 
 The installer detects your OS/arch, downloads the matching release archive,
@@ -64,7 +64,7 @@ binary via the universal script and runs `maat check` on every pull request.
 On GitHub, the shortest wiring is the published composite action:
 
 ```yaml
-- uses: UemitCebi/maat@v0.2.0
+- uses: getmaat/maat@v0.2.0
   with:
     version: "0.2.0"   # optional; omit to track the latest release
 ```
@@ -75,7 +75,7 @@ checkout, and flags live in one place:
 ```yaml
 jobs:
   maat:
-    uses: UemitCebi/maat/.github/workflows/maat-check.yml@v0.2.0
+    uses: getmaat/maat/.github/workflows/maat-check.yml@v0.2.0
     with:
       maat_version: "0.2.0"
 ```
@@ -83,7 +83,7 @@ jobs:
 For non-GitHub CI, install the binary and run the same command:
 
 ```bash
-curl -sSf https://raw.githubusercontent.com/UemitCebi/maat/main/scripts/install.sh | MAAT_VERSION=0.2.0 sh
+curl -sSf https://raw.githubusercontent.com/getmaat/maat/main/scripts/install.sh | MAAT_VERSION=0.2.0 sh
 maat check --format text
 ```
 

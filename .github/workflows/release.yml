@@ -35,7 +35,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Publish a cross-platform Homebrew *formula* (macOS + Linuxbrew, no
-      # Gatekeeper quarantine) to UemitCebi/homebrew-tap. Uses the checksums
+      # Gatekeeper quarantine) to getmaat/homebrew-tap. Uses the checksums
       # GoReleaser just wrote to dist/checksums.txt. Skips gracefully if the
       # HOMEBREW_TAP_TOKEN secret is not configured, so the GitHub Release is
       # never blocked on it.
@@ -51,7 +51,7 @@ jobs:
           VERSION="${GITHUB_REF_NAME#v}"
           ./scripts/render-homebrew-formula.sh "$VERSION" dist/checksums.txt > /tmp/maat.rb
 
-          git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/UemitCebi/homebrew-tap.git" /tmp/tap
+          git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/getmaat/homebrew-tap.git" /tmp/tap
           mkdir -p /tmp/tap/Formula
           cp /tmp/maat.rb /tmp/tap/Formula/maat.rb
 

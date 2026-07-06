@@ -5,7 +5,7 @@
 #
 # Usage in a repo's workflow:
 #
-#   - uses: UemitCebi/maat@v0.2.0          # or actions/checkout of this repo
+#   - uses: getmaat/maat@v0.2.0          # or actions/checkout of this repo
 #     with:
 #       version: 0.2.0                     # optional; defaults to latest
 #       args: --format github              # optional extra `maat check` flags
@@ -42,7 +42,7 @@ runs:
         # Install into a dir already on PATH for GitHub-hosted runners.
         MAAT_INSTALL_DIR: /usr/local/bin
       run: |
-        curl -sSf https://raw.githubusercontent.com/UemitCebi/maat/main/scripts/install.sh | sh
+        curl -sSf https://raw.githubusercontent.com/getmaat/maat/main/scripts/install.sh | sh
         maat --version
 
     - name: Run maat check

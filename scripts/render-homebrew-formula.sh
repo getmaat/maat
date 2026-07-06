@@ -37,7 +37,7 @@ DARWIN_AMD="$(sha_for darwin_amd64.tar.gz)"
 LINUX_ARM="$(sha_for linux_arm64.tar.gz)"
 LINUX_AMD="$(sha_for linux_amd64.tar.gz)"
 
-BASE_URL="https://github.com/UemitCebi/maat/releases/download/v${VERSION}"
+BASE_URL="https://github.com/getmaat/maat/releases/download/v${VERSION}"
 
 cat <<EOF
 # typed: false
@@ -48,7 +48,7 @@ cat <<EOF
 # Do not edit by hand; changes are overwritten on the next release.
 class Maat < Formula
   desc "Documentation-as-code for humans and AI agents"
-  homepage "https://github.com/UemitCebi/maat"
+  homepage "https://github.com/getmaat/maat"
   version "${VERSION}"
   license "Apache-2.0"
 

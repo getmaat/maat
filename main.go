@@ -6,7 +6,7 @@ package main
 import (
 	"os"
 
-	"github.com/UemitCebi/maat/internal/maat"
+	"github.com/getmaat/maat/internal/maat"
 )
 
 func main() {
