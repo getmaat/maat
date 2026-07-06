@@ -13,14 +13,14 @@
 # It installs via scripts/install.sh (no Go toolchain required) and emits
 # GitHub annotations by default so findings surface inline on the PR.
 name: "maat check"
-description: "Install Ma'at and validate a repository's docs-as-code set (the CI gate)."
+description: "Install maat and validate docs-as-code in a repository (the CI gate)."
 branding:
   icon: "check-circle"
   color: "blue"
 
 inputs:
   version:
-    description: "Ma'at version to install (e.g. 0.1.0). Defaults to the latest release. Pin this to match your repo's maat_version constraint for reproducible CI."
+    description: "maat version to install (e.g. 0.1.0). Defaults to the latest release. Pin this to match the maat_version constraint in your repo for reproducible CI."
     required: false
     default: ""
   path:
