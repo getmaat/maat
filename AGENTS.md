@@ -123,3 +123,17 @@ Before declaring any change done: run `go run . check` **and**
 Agents may draft documentation changes, but a human reviews them in the pull
 request alongside the code. CI (`maat check`) enforces that docs were kept
 in sync; the reviewer confirms they are *correct*.
+
+<!-- maat:begin (generated — edit the source docs, not this block) -->
+## Skills (reusable procedures)
+
+Ma'at ships step-by-step procedures for recurring documentation tasks
+under `.maat/skills/`. When a task matches one, read the skill file
+and follow it.
+
+- [`retrospect`](.maat/skills/retrospect/SKILL.md) — Retrofit Ma'at documentation onto an existing repository: inventory gaps, interview the developer, derive documentation and retrospective ADRs.
+
+These files are generated — `maat sync` regenerates them, and hand-edits
+are overwritten. Team-authored skills may live alongside them and are
+never touched.
+<!-- maat:end -->

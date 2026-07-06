@@ -32,6 +32,8 @@ humans can use the map below.
 - [0004 Detect staleness via related_code timestamps](decisions/0004-related-code-staleness.md) — Docs declare the source files they describe; check compares mtimes to flag docs that may lag behind code.
 - [0005 Rewrite the CLI in Go, distribute a single static binary](decisions/0005-go-rewrite.md) — The CLI is rewritten in Go and shipped as one static binary; the Python reference is retired. Supersedes 0002.
 - [0006 Distribution and version pinning](decisions/0006-distribution-and-versioning.md) — Ma'at is adopted through a CI gate as the authority, a universal curl|sh installer plus published Action/reusable workflow, and an in-config maat_version constraint the released binary self-enforces.
+- [0007 Agent skills as managed artifacts](decisions/0007-agent-skills-as-managed-artifacts.md) — Ma'at ships agent skills as version-stamped copies under .maat/skills/, generated from templates embedded in the binary, kept fresh by sync/check, and discovered through AGENTS.md with optional vendor fan-out.
+- [0008 Brownfield adoption and BYO-agent retrospection](decisions/0008-brownfield-adoption-byo-agent.md) — Adopting Ma'at in an existing repository is non-destructive by default; deriving documentation from an established codebase is delegated to the user's own AI agent via a shipped retrospect skill, with the CLI providing only deterministic facts.
 - [Architecture Decision Records](decisions/README.md) — Index of ADRs — the append-only log of why the system is the way it is.
 
 ### Guides — how to work on it

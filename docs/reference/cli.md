@@ -32,13 +32,20 @@ the derived files.
 | `--force` | Overwrite existing scaffold files (default: skip files that exist) |
 
 Existing files are never overwritten unless `--force` is given, so re-running
-`init` is safe and only fills in what is missing.
+`init` is safe and only fills in what is missing. When files are skipped
+(brownfield adoption in an existing repository), `init` prints next-steps
+guidance: run `maat check` for the gap list, and point your AI agent at the
+scaffolded `.maat/skills/retrospect/SKILL.md` to derive documentation from the
+existing codebase. See
+[ADR 0008](../decisions/0008-brownfield-adoption-byo-agent.md).
 
 ## `sync`
 
 Regenerate every derived artifact from the docs tree: `docs/llms.txt`, the
-managed navigation block in `docs/index.md`, and the configured agent adapter
-files. Only files whose content actually changes are rewritten. Run this after
+managed navigation block in `docs/index.md`, the configured agent adapter
+files, and the managed agent skills (`.maat/skills/`, their vendor copies, and
+the skills block in `AGENTS.md`). Only files whose content actually changes
+are rewritten. Run this after
 editing any doc's front-matter, adding/removing a doc, or changing the adapter
 list in `.maat.yml`.
 
