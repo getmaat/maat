@@ -46,12 +46,23 @@ This creates `AGENTS.md`, the `docs/` tree, `templates/`, `.maat.yml`, the
 CI workflow, and generates `llms.txt` and the agent adapter files. Existing
 files are not overwritten.
 
+If your repository **already has an `AGENTS.md`**, `init` preserves it (it is
+listed as `skip`) and still splices Ma'at's maintenance contract — the
+documentation update protocol, the front-matter schema, and the skills index —
+into a managed `<!-- maat:begin --> … <!-- maat:end -->` block inside it (ADR
+[0009](../decisions/0009-contract-as-managed-block.md)). So the same file can
+appear under both `skip` and `gen`: your hand-written prose is untouched, and
+only the marked block is Ma'at's. That block self-heals on every `maat sync`.
+
 ## 3. Fill in the starters
 
-Edit `AGENTS.md`'s project overview and the scaffolded docs. Delete adapters
-you do not need from `.maat.yml` and re-run `maat sync`. Commit
-everything, including the generated files (agents read them from a fresh
-clone).
+Edit `AGENTS.md`'s project overview and the scaffolded docs — the maintenance
+contract is maintained for you in the generated block, so you only fill in the
+project-specific prose. Delete adapters you do not need from `.maat.yml` and
+re-run `maat sync`. Commit everything, including the generated files (agents
+read them from a fresh clone). For deriving real architecture docs and ADRs
+from an established codebase, point your agent at the scaffolded
+`retrospect` skill (ADR [0008](../decisions/0008-brownfield-adoption-byo-agent.md)).
 
 ## 4. Wire up CI
 

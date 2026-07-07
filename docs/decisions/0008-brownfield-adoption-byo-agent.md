@@ -9,6 +9,7 @@ summary: Adopting Ma'at in an existing repository is non-destructive by default;
 - **Status:** accepted
 - **Date:** 2026-07-03
 - **Relates to:** [0003 AGENTS.md as the source of truth, with generated adapters](0003-agents-md-source-of-truth.md), [0007 Agent skills as managed artifacts](0007-agent-skills-as-managed-artifacts.md)
+- **Refined by:** [0009 Maintenance contract as a managed block](0009-contract-as-managed-block.md) — the update protocol, which this ADR left to the agent as "content", is now recognized as a framework invariant and injected into the instruction file as a managed block.
 
 ## Context
 

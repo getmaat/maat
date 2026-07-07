@@ -76,23 +76,27 @@ func expectedArtifacts(model *DocsModel, cfg map[string]any, root string) []orde
 		}
 	}
 
-	// 4. Agent skills (ADR 0007) — canonical copies under .maat/skills/, a
-	// managed discovery block in the instruction file, and copies fanned out
-	// to vendor-native skill directories of the enabled adapters.
-	if len(skillDefs) > 0 {
-		for _, def := range skillDefs {
-			body := skillContent(def, docsDir, instructions)
-			artifacts = append(artifacts, orderedArtifact{skillsRoot + "/" + def.name + "/SKILL.md", body})
-			for _, target := range adaptersFor(cfg) {
-				if target.skillsDir == "" {
-					continue
-				}
-				artifacts = append(artifacts, orderedArtifact{target.skillsDir + "/maat-" + def.name + "/SKILL.md", body})
+	// 4. Agent skills (ADR 0007) — canonical copies under .maat/skills/ and
+	// copies fanned out to vendor-native skill directories of the enabled
+	// adapters. The skill files themselves are only emitted when skills exist.
+	for _, def := range skillDefs {
+		body := skillContent(def, docsDir, instructions)
+		artifacts = append(artifacts, orderedArtifact{skillsRoot + "/" + def.name + "/SKILL.md", body})
+		for _, target := range adaptersFor(cfg) {
+			if target.skillsDir == "" {
+				continue
 			}
+			artifacts = append(artifacts, orderedArtifact{target.skillsDir + "/maat-" + def.name + "/SKILL.md", body})
 		}
-		existing := readFileOrEmpty(filepath.Join(root, instructions))
-		artifacts = append(artifacts, orderedArtifact{instructions, splice(existing, skillsBlock(skillDefs))})
 	}
+
+	// 5. Maintenance-contract block spliced into the instruction file (ADR 0009):
+	// the update protocol, the front-matter schema, and the skills discovery
+	// list. This is emitted unconditionally — even with zero skills — so a
+	// brownfield instruction file that `init` skipped still gains Ma'at's
+	// contract non-destructively, and it self-heals on every sync.
+	existing := readFileOrEmpty(filepath.Join(root, instructions))
+	artifacts = append(artifacts, orderedArtifact{instructions, splice(existing, contractBlock(skillDefs, docsDir))})
 	return artifacts
 }
 

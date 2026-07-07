@@ -54,44 +54,13 @@ first-class part of every change.
    area you are about to touch. Do not silently contradict an accepted
    decision — if one should change, write a new ADR that supersedes it.
 
-## Documentation update protocol
-
-**A change is not complete until its documentation is updated in the same
-change.** Treat docs edits as part of the diff, never a follow-up.
-
-When you modify code, update docs as follows:
-
-| If you… | Then update… |
-|---|---|
-| Change how a module works or how modules relate | the module's page in `docs/architecture/` |
-| Make a non-obvious, hard-to-reverse choice | add a new ADR in `docs/decisions/` (copy `_template.md`) |
-| Change build/test/deploy/run steps | the relevant `docs/guides/` page |
-| Add/rename/remove a CLI flag, config key, or front-matter field | `docs/reference/` |
-| Add or move a source file a doc's `related_code` points at | that doc's `related_code` front-matter |
-
-Then regenerate derived indexes and adapter files, and validate:
-
-```bash
-maat sync      # regenerate llms.txt, docs/index.md nav, adapters
-maat check     # fails on stale/broken/missing/drifted docs
-```
-
-### Front-matter every doc carries
-
-Each Markdown file in `docs/` begins with a front-matter block. The
-`related_code` list is what lets tooling detect when code drifts from docs:
-
-```markdown
----
-title: Human-readable title
-status: current            # current | draft | deprecated
-summary: One-line description used in indexes.
-related_code:              # source paths this doc describes (optional)
-  - internal/maat/check.go
----
-```
-
-Full schema: [`docs/reference/frontmatter.md`](docs/reference/frontmatter.md).
+<!--
+The Documentation update protocol and the front-matter schema are Ma'at
+framework invariants (ADR 0009). They are maintained for every repo in the
+generated managed block below (the same block that carries the skills list),
+so they are not hand-written here. `maat sync` splices them in; edit the
+generators, not the block. Full front-matter schema: docs/reference/frontmatter.md.
+-->
 
 ## Setup, build, and test commands
 
@@ -128,6 +97,44 @@ request alongside the code. CI (`maat check`) enforces that docs were kept
 in sync; the reviewer confirms they are *correct*.
 
 <!-- maat:begin (generated — edit the source docs, not this block) -->
+## Documentation update protocol
+
+**A change is not complete until its documentation is updated in the same
+change.** Treat docs edits as part of the diff, never a follow-up.
+
+When you modify code, update docs as follows:
+
+| If you… | Then update… |
+|---|---|
+| Change how a module works or how modules relate | the module's page in `docs/architecture/` |
+| Make a non-obvious, hard-to-reverse choice | add a new ADR in `docs/decisions/` (copy `_template.md`) |
+| Change build/test/deploy/run steps | the relevant `docs/guides/` page |
+| Add/rename/remove a CLI flag, config key, or front-matter field | `docs/reference/` |
+| Add or move a source file a doc's `related_code` points at | that doc's `related_code` front-matter |
+
+Then regenerate derived indexes and adapter files, and validate before
+committing:
+
+```bash
+maat sync      # regenerate llms.txt, index nav, adapters, and this block
+maat check     # fails on stale/broken/missing/drifted docs
+```
+
+### Front-matter every doc carries
+
+Each Markdown file in `docs/` begins with a front-matter block. The
+`related_code` list is what lets tooling detect when code drifts from docs:
+
+```markdown
+---
+title: Human-readable title
+status: current            # current | draft | deprecated
+summary: One-line description used in indexes.
+related_code:              # source paths this doc describes (optional)
+  - src/module/thing.ext
+---
+```
+
 ## Skills (reusable procedures)
 
 Ma'at ships step-by-step procedures for recurring documentation tasks

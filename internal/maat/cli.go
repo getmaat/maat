@@ -192,11 +192,18 @@ func cmdInit(args []string, stdout, _ io.Writer) (int, error) {
 	if len(result.Skipped) > 0 {
 		// Brownfield adoption (ADR 0008): pre-existing files were preserved,
 		// so the scaffold is incomplete by design. Tell the user what that
-		// means and where the procedure for closing the gap lives.
+		// means and where the procedure for closing the gap lives. The
+		// maintenance contract (update protocol + skills) was still spliced
+		// into the instruction file as a managed block (ADR 0009), so call
+		// that out — it explains why AGENTS.md can appear as both skip and gen.
 		fmt.Fprintf(stdout, "\n%d file(s) already existed and were left untouched (listed as `skip` above).\n"+
 			"They are yours — Ma'at never overwrites hand-written files (use --force to override).\n"+
+			"Ma'at did splice its maintenance contract (the documentation update protocol\n"+
+			"and the skills index) into a managed block in your existing instruction file —\n"+
+			"that is why it may appear under both `skip` and `gen`. Your hand-written text\n"+
+			"is preserved; only the marked block is Ma'at's.\n"+
 			"To finish adopting Ma'at in this existing repository:\n"+
-			"  1. Run `maat check` to see what the preserved files are missing.\n"+
+			"  1. Run `maat check` to see what the preserved files are still missing.\n"+
 			"  2. Reconcile each skipped file with its scaffolded counterpart —\n"+
 			"     or let your AI agent do it: point it at %s/retrospect/SKILL.md,\n"+
 			"     which walks through deriving docs and ADRs from an existing codebase.\n"+

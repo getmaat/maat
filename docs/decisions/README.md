@@ -18,6 +18,7 @@ Copy [`_template.md`](_template.md) to `NNNN-short-title.md` (next number).
 
 Newest first:
 
+- [0009 Maintenance contract as a managed block in the instruction file](0009-contract-as-managed-block.md)
 - [0008 Brownfield adoption and BYO-agent retrospection](0008-brownfield-adoption-byo-agent.md)
 - [0007 Agent skills as managed artifacts](0007-agent-skills-as-managed-artifacts.md)
 - [0006 Distribution and version pinning](0006-distribution-and-versioning.md)

@@ -39,12 +39,20 @@ scaffolded `.maat/skills/retrospect/SKILL.md` to derive documentation from the
 existing codebase. See
 [ADR 0008](../decisions/0008-brownfield-adoption-byo-agent.md).
 
+Even when the instruction file (`AGENTS.md`) already exists and is skipped,
+`init` still splices Ma'at's **maintenance contract** — the documentation
+update protocol, the front-matter schema, and the skills index — into a managed
+block inside it, non-destructively (see
+[ADR 0009](../decisions/0009-contract-as-managed-block.md)). That is why the
+instruction file can be reported as both `skip` and `gen`.
+
 ## `sync`
 
 Regenerate every derived artifact from the docs tree: `docs/llms.txt`, the
 managed navigation block in `docs/index.md`, the configured agent adapter
-files, and the managed agent skills (`.maat/skills/`, their vendor copies, and
-the skills block in `AGENTS.md`). Only files whose content actually changes
+files, the managed agent skills (`.maat/skills/` and their vendor copies), and
+the managed maintenance-contract block in `AGENTS.md` (update protocol,
+front-matter schema, and skills index — ADR 0009). Only files whose content actually changes
 are rewritten. Run this after
 editing any doc's front-matter, adding/removing a doc, or changing the adapter
 list in `.maat.yml`.

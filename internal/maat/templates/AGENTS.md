@@ -43,47 +43,14 @@ first-class part of every change.
    to touch. Do not silently contradict an accepted decision — if you believe
    one should change, write a new ADR that supersedes it.
 
-## Documentation update protocol
-
-**A change is not complete until its documentation is updated in the same
-change.** Treat docs edits as part of the diff, never a follow-up.
-
-When you modify code, update docs as follows:
-
-| If you… | Then update… |
-|---|---|
-| Change how a module works or relate to each other | the module's page in `docs/architecture/` |
-| Make a non-obvious, hard-to-reverse choice | add a new ADR in `docs/decisions/` (copy `_template.md`) |
-| Change build/test/deploy/run steps | the relevant `docs/guides/` page |
-| Add/rename/remove config keys, env vars, or public API | `docs/reference/` |
-| Add or move a source file that a doc's `related_code` points at | that doc's `related_code` front-matter |
-
-Then regenerate derived indexes and adapter files:
-
-```bash
-maat sync
-```
-
-And validate before committing:
-
-```bash
-maat check     # fails on stale/broken/missing docs
-```
-
-### Front-matter every doc carries
-
-Each Markdown file in `docs/` begins with a front-matter block. The
-`related_code` list is what lets tooling detect when code drifts from docs:
-
-```markdown
----
-title: Human-readable title
-status: current            # current | draft | deprecated
-summary: One-line description used in indexes.
-related_code:              # source paths this doc describes (optional)
-  - src/module/thing.ext
----
-```
+<!--
+The Documentation update protocol, the front-matter schema, and the skills
+list are Ma'at framework invariants, so they are maintained for you in a
+generated managed block that `maat sync` splices in below (edit the source
+docs, not that block). This keeps the contract identical in every Ma'at repo
+and lets it drop non-destructively into a brownfield AGENTS.md that already
+existed. Keep this file's hand-written sections (above) about *this* project.
+-->
 
 ## Human approval
 

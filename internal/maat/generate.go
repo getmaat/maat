@@ -159,13 +159,62 @@ func skillContent(def skillDef, docsDir, instructions string) string {
 	return repl.Replace(tmpl(def.tmpl))
 }
 
-// skillsBlock renders the managed skills section spliced into the instruction
-// file (ADR 0007): the agent-agnostic discovery mechanism. Any agent that
-// honors the instruction file can follow these relative links, so no native
-// skills feature is required.
-func skillsBlock(defs []skillDef) string {
+// contractBlock renders the managed "maintenance contract" section spliced into
+// the instruction file. It carries Ma'at's framework invariants — the
+// documentation update protocol, the front-matter schema, and the agent-skills
+// discovery list (ADR 0007) — as generated content, so that even a brownfield
+// instruction file that `init` preserved untouched gains the contract
+// non-destructively, and it self-heals on every `sync` (ADR 0009). Only
+// genuinely project-specific prose (the overview, the docs map) is left to
+// humans and the retrospect skill (ADR 0008). The paths are parameterized on
+// docsDir so a repo with a non-default docs directory gets correct links.
+//
+// The block is the agent-agnostic mechanism: any agent that honors the
+// instruction file can follow these relative links, so no native skills or
+// protocol feature is required of the harness.
+func contractBlock(defs []skillDef, docsDir string) string {
 	var lines []string
 	lines = append(lines,
+		// Heading kept verbatim: the generated adapter pointers reference the
+		// instruction file "under \"Documentation update protocol\"".
+		"## Documentation update protocol",
+		"",
+		"**A change is not complete until its documentation is updated in the same",
+		"change.** Treat docs edits as part of the diff, never a follow-up.",
+		"",
+		"When you modify code, update docs as follows:",
+		"",
+		"| If you… | Then update… |",
+		"|---|---|",
+		"| Change how a module works or how modules relate | the module's page in `"+docsDir+"/architecture/` |",
+		"| Make a non-obvious, hard-to-reverse choice | add a new ADR in `"+docsDir+"/decisions/` (copy `_template.md`) |",
+		"| Change build/test/deploy/run steps | the relevant `"+docsDir+"/guides/` page |",
+		"| Add/rename/remove a CLI flag, config key, or front-matter field | `"+docsDir+"/reference/` |",
+		"| Add or move a source file a doc's `related_code` points at | that doc's `related_code` front-matter |",
+		"",
+		"Then regenerate derived indexes and adapter files, and validate before",
+		"committing:",
+		"",
+		"```bash",
+		"maat sync      # regenerate llms.txt, index nav, adapters, and this block",
+		"maat check     # fails on stale/broken/missing/drifted docs",
+		"```",
+		"",
+		"### Front-matter every doc carries",
+		"",
+		"Each Markdown file in `"+docsDir+"/` begins with a front-matter block. The",
+		"`related_code` list is what lets tooling detect when code drifts from docs:",
+		"",
+		"```markdown",
+		"---",
+		"title: Human-readable title",
+		"status: current            # current | draft | deprecated",
+		"summary: One-line description used in indexes.",
+		"related_code:              # source paths this doc describes (optional)",
+		"  - src/module/thing.ext",
+		"---",
+		"```",
+		"",
 		"## Skills (reusable procedures)",
 		"",
 		"Ma'at ships step-by-step procedures for recurring documentation tasks",
