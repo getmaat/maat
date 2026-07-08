@@ -1,7 +1,7 @@
 # Ma'at
 
 <p align="center">
-  <img src=".github/assets/maat-logo.webp" alt="Ma'at logo" width="120">
+  <img src=".github/assets/maat-logo.webp" alt="Ma'at logo" width="420">
 </p>
 
 <p align="center">
