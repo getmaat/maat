@@ -115,6 +115,21 @@ func scaffoldActionRef() string {
 	return "v" + v
 }
 
+// adaptersBlock renders the config.yml `adapters:` key and its list, for
+// however many agents were chosen (zero is valid: AGENTS.md-only, no
+// per-agent adapter files at all).
+func adaptersBlock(agents []string) string {
+	if len(agents) == 0 {
+		return "adapters: []"
+	}
+	var b strings.Builder
+	b.WriteString("adapters:")
+	for _, a := range agents {
+		b.WriteString("\n  - " + a)
+	}
+	return b.String()
+}
+
 func fill(text string, subs map[string]string) string {
 	// Longest keys first so {{SUMMARY_INLINE}} is not partially matched by
 	// {{SUMMARY}}. Go maps are unordered, so sort explicitly.
@@ -137,8 +152,11 @@ type InitResult struct {
 }
 
 // RunInit scaffolds Ma'at into root. Existing files are skipped unless force
-// is set, so re-running init is safe. After stamping files it runs sync.
-func RunInit(root, project, summary string, force bool) (*InitResult, error) {
+// is set, so re-running init is safe. agents is the exact adapters: list to
+// stamp into a freshly-written .maat.yml (see adaptersBlock) — callers
+// resolve defaults/flags/wizard input before calling this. After stamping
+// files it runs sync.
+func RunInit(root, project, summary string, agents []string, force bool) (*InitResult, error) {
 	summary = strings.TrimSpace(summary)
 	if summary == "" {
 		summary = "TODO: one-paragraph description of this project."
@@ -156,6 +174,7 @@ func RunInit(root, project, summary string, force bool) (*InitResult, error) {
 		"PATH":            "src/example",
 		"MAAT_VERSION":    scaffoldVersionPin(),
 		"MAAT_ACTION_REF": scaffoldActionRef(),
+		"ADAPTERS_BLOCK":  adaptersBlock(agents),
 	}
 
 	result := &InitResult{}

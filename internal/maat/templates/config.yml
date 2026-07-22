@@ -12,14 +12,9 @@ instructions_file: AGENTS.md
 # maat_version: "~> {{MAAT_VERSION}}"
 
 # Per-agent adapter files to generate and keep in sync with AGENTS.md.
-# Remove any your team does not use.
-adapters:
-  - claude
-  - hermes
-  - copilot
-  - cursor
-  - windsurf
-  - gemini
+# `maat init --agents=...` (or its interactive prompt) sets this list; edit it
+# by hand and re-run `maat sync` to add or remove an agent later.
+{{ADAPTERS_BLOCK}}
 
 required_frontmatter:
   - title

@@ -72,7 +72,9 @@ Each entry generates one agent-specific file, kept in sync with
 | `windsurf` | `.windsurf/rules/maat.md` |
 | `gemini` | `GEMINI.md` |
 
-Remove any your team does not use; `sync` will stop generating them (delete the
+`maat init --agents=...` (or its interactive prompt) sets this list up front —
+see the [CLI reference](cli.md#init). To change it later, hand-edit this list
+and re-run `sync`; it will stop generating any adapter you removed (delete the
 stale file once). See
 [ADR 0003](../decisions/0003-agents-md-source-of-truth.md).
 

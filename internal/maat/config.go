@@ -30,16 +30,48 @@ var adapterTargets = map[string]adapterTarget{
 	"gemini":   {"GEMINI.md", "pointer", "Gemini CLI", ""},
 }
 
+// adapterOrder is the canonical, deterministic ordering of adapterTargets —
+// Go map iteration order is random, but the scaffolded .maat.yml, the
+// --agents flag's "all" shorthand, and the init wizard's multi-select all
+// need one stable order to render/list adapters in.
+var adapterOrder = []string{"claude", "hermes", "copilot", "cursor", "windsurf", "gemini"}
+
+// knownAdapterNames returns adapterOrder's names sorted, for error messages.
+func knownAdapterNames() []string {
+	known := make([]string, 0, len(adapterTargets))
+	for k := range adapterTargets {
+		known = append(known, k)
+	}
+	sort.Strings(known)
+	return known
+}
+
+// validateAgentNames checks a candidate --agents/wizard selection against the
+// known adapter registry, independent of any .maat.yml — used by cmdInit
+// before a config file exists to validate it can write.
+func validateAgentNames(names []string) error {
+	for _, name := range names {
+		if _, ok := adapterTargets[name]; !ok {
+			return fmt.Errorf("unknown adapter %s (known: %s)", pyRepr(name), strings.Join(knownAdapterNames(), ", "))
+		}
+	}
+	return nil
+}
+
 const configFilename = ".maat.yml"
 
 // defaultConfig returns a fresh copy of the default configuration. Every knob
 // has a default so a repo can adopt Ma'at with an empty or absent config
 // file and still get sensible behaviour.
 func defaultConfig() map[string]any {
+	adapters := make([]any, len(adapterOrder))
+	for i, a := range adapterOrder {
+		adapters[i] = a
+	}
 	return map[string]any{
 		"docs_dir":             "docs",
 		"instructions_file":    "AGENTS.md",
-		"adapters":             []any{"claude", "hermes", "copilot", "cursor", "windsurf", "gemini"},
+		"adapters":             adapters,
 		"required_frontmatter": []any{"title", "status"},
 		"statuses":             []any{"current", "draft", "deprecated"},
 		"check": map[string]any{
@@ -101,15 +133,8 @@ func LoadConfig(root string) (map[string]any, error) {
 }
 
 func validateConfig(cfg map[string]any) error {
-	for _, name := range toStringList(cfg["adapters"]) {
-		if _, ok := adapterTargets[name]; !ok {
-			known := make([]string, 0, len(adapterTargets))
-			for k := range adapterTargets {
-				known = append(known, k)
-			}
-			sort.Strings(known)
-			return fmt.Errorf("unknown adapter %s (known: %s)", pyRepr(name), strings.Join(known, ", "))
-		}
+	if err := validateAgentNames(toStringList(cfg["adapters"])); err != nil {
+		return fmt.Errorf("%w in %s", err, configFilename)
 	}
 	staleness := checkStr(cfg, "staleness", "")
 	if staleness != "off" && staleness != "warn" && staleness != "error" {

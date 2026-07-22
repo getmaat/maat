@@ -30,8 +30,10 @@ existed (see [ADR 0011](../../decisions/0011-build-time-go-dependencies.md)).
   functions that wrap the exact literal text `cli.go` already prints in
   ANSI escapes — never changing spacing or wording.
 - `internal/maat/wizard.go` — the Huh form (`runInitWizard`, a var-func
-  seam) that prompts for `init`'s project name/summary when no
-  `--name`/`--summary` flags were given and `isInteractiveTerminal` is true.
+  seam) that prompts for `init`'s project name, summary, and agent adapter
+  selection (a `huh.MultiSelect` over `adapterOrder`) when none of
+  `--name`/`--summary`/`--agents` were given and `isInteractiveTerminal` is
+  true.
 
 ## Interfaces / contracts
 
@@ -44,10 +46,13 @@ existed (see [ADR 0011](../../decisions/0011-build-time-go-dependencies.md)).
   are never touched — `styledFindingLine` in `style.go` is a parallel
   function, not a rewrite, and `--format github` is never routed through
   color regardless of TTY/env state.
-- `runInitWizard` returns `wizardResult{name, summary string; ok bool}`;
-  `ok == false` with a `nil` error means the user aborted the form
+- `runInitWizard` returns `wizardResult{name, summary string; agents []string;
+  ok bool}`; `ok == false` with a `nil` error means the user aborted the form
   (`huh.ErrUserAborted`) — `cmdInit` maps that to exit code `130`, not an
-  error.
+  error. The multi-select's initial checked state is seeded from the
+  caller-supplied `defaultAgents` (the repo's current `adapters:`, or every
+  adapter for a fresh repo) — see [configuration reference:
+  adapters](../../reference/configuration.md#adapters).
 
 ## Gotchas
 

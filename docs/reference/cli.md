@@ -13,7 +13,7 @@ commands take an optional trailing `PATH` argument — the repository root — w
 defaults to the current directory.
 
 ```
-maat init  [--name NAME] [--summary TEXT] [--force] [PATH]
+maat init  [--name NAME] [--summary TEXT] [--agents LIST] [--force] [PATH]
 maat sync  [PATH]
 maat check [--format text|github] [--strict] [PATH]
 maat --version
@@ -30,6 +30,7 @@ Scaffold Ma'at into a repository: writes `AGENTS.md`, the `docs/` tree,
 |------|--------|
 | `--name NAME` | Project name used in generated content (default: directory name) |
 | `--summary TEXT` | One-line project summary stamped into `AGENTS.md`/`llms.txt` |
+| `--agents LIST` | Comma-separated adapter names to write into `.maat.yml`'s `adapters:` (e.g. `claude,cursor`); `all` for every adapter; `` (empty) for none — AGENTS.md-only. Default: every adapter (see below). |
 | `--force` | Overwrite existing scaffold files (default: skip files that exist) |
 
 Existing files are never overwritten unless `--force` is given, so re-running
@@ -47,14 +48,25 @@ block inside it, non-destructively (see
 [ADR 0009](../decisions/0009-contract-as-managed-block.md)). That is why the
 instruction file can be reported as both `skip` and `gen`.
 
-If `init` is run with **neither** `--name` nor `--summary`, **and** stdout and
-stdin are both a real terminal, it prompts interactively for them instead of
-falling back to the directory name and a `TODO` placeholder. Giving either
-flag, or running non-interactively (piped output, no TTY, CI), skips the
-prompt entirely and behaves exactly as before. Aborting the prompt (Ctrl-C or
-Esc) exits `130` without scaffolding anything. See
+If `init` is run with **none** of `--name`, `--summary`, or `--agents`, **and**
+stdout and stdin are both a real terminal, it prompts interactively for all
+three instead of falling back to the directory name, a `TODO` placeholder, and
+every adapter. Giving any one of those flags, or running non-interactively
+(piped output, no TTY, CI), skips the prompt entirely and behaves exactly as
+before. Aborting the prompt (Ctrl-C or Esc) exits `130` without scaffolding
+anything. The agent multi-select is pre-checked from whatever `.maat.yml`
+already has configured (every adapter, on a fresh repo), so re-running `init`
+on an already-adopted repo reflects its current selection rather than
+resetting it. See
 [ADR 0011](../decisions/0011-build-time-go-dependencies.md) and the
 [terminal presentation module](../architecture/modules/presentation.md).
+
+`--agents`/the wizard only ever *write* `.maat.yml` when it doesn't already
+exist — like every other scaffold file, an existing `.maat.yml` is preserved
+untouched (see above). If you choose an agent that isn't already in an
+existing repo's `adapters:` list, `init` prints the exact line to add and
+tells you to run `maat sync`; it never hand-edits your config file for you.
+See [configuration reference: adapters](configuration.md#adapters).
 
 ## `sync`
 

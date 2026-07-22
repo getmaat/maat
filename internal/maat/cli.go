@@ -88,12 +88,14 @@ func Main(argv []string, stdout, stderr io.Writer) int {
 
 // parsed holds the parsed flags/positional common to the subcommands.
 type parsed struct {
-	path    string
-	name    string
-	summary string
-	force   bool
-	format  string
-	strict  bool
+	path      string
+	name      string
+	summary   string
+	force     bool
+	format    string
+	strict    bool
+	agents    []string
+	agentsSet bool // distinguishes "--agents=" (explicitly zero agents) from "not given"
 }
 
 // parseArgs parses a subcommand's arguments. allowed lists the value-taking
@@ -120,6 +122,16 @@ func parseArgs(command string, args []string) (*parsed, error) {
 				return nil, err
 			}
 			p.summary, i = val, next
+		case arg == "--agents" && command == "init":
+			val, next, err := flagValue(args, i)
+			if err != nil {
+				return nil, err
+			}
+			agents, err := parseAgentsFlag(val)
+			if err != nil {
+				return nil, err
+			}
+			p.agents, p.agentsSet, i = agents, true, next
 		case arg == "--format" && command == "check":
 			val, next, err := flagValue(args, i)
 			if err != nil {
@@ -133,6 +145,12 @@ func parseArgs(command string, args []string) (*parsed, error) {
 			p.name = strings.TrimPrefix(arg, "--name=")
 		case strings.HasPrefix(arg, "--summary=") && command == "init":
 			p.summary = strings.TrimPrefix(arg, "--summary=")
+		case strings.HasPrefix(arg, "--agents=") && command == "init":
+			agents, err := parseAgentsFlag(strings.TrimPrefix(arg, "--agents="))
+			if err != nil {
+				return nil, err
+			}
+			p.agents, p.agentsSet = agents, true
 		case strings.HasPrefix(arg, "--format=") && command == "check":
 			val := strings.TrimPrefix(arg, "--format=")
 			if val != "text" && val != "github" {
@@ -161,6 +179,26 @@ func flagValue(args []string, i int) (string, int, error) {
 	return args[i+1], i + 1, nil
 }
 
+// parseAgentsFlag parses --agents' value: a comma-separated list of adapter
+// names, "all" as shorthand for adapterOrder, or "" for explicitly zero
+// agents (AGENTS.md only, no per-agent adapter files).
+func parseAgentsFlag(val string) ([]string, error) {
+	val = strings.TrimSpace(val)
+	if val == "all" {
+		return append([]string{}, adapterOrder...), nil
+	}
+	var names []string
+	for _, part := range strings.Split(val, ",") {
+		if part = strings.TrimSpace(part); part != "" {
+			names = append(names, part)
+		}
+	}
+	if err := validateAgentNames(names); err != nil {
+		return nil, &usageError{fmt.Sprintf("argument --agents: %s", err)}
+	}
+	return names, nil
+}
+
 // cmdInit's (int, error) signature matches cmdSync/cmdCheck so Main can
 // dispatch to all three uniformly.
 func cmdInit(args []string, stdout, _ io.Writer) (int, error) {
@@ -170,8 +208,14 @@ func cmdInit(args []string, stdout, _ io.Writer) (int, error) {
 	}
 	root := absRoot(p.path)
 	name, summary := p.name, p.summary
-	if name == "" && summary == "" && isInteractiveTerminal(stdout) {
-		w, err := runInitWizard(filepath.Base(root))
+	agents, agentsChosen := p.agents, p.agentsSet
+	if name == "" && summary == "" && !agentsChosen && isInteractiveTerminal(stdout) {
+		// Seed the wizard's agent multi-select from whatever's already
+		// configured (LoadConfig defaults to adapterOrder when .maat.yml is
+		// absent), so a re-init shows the repo's actual current state rather
+		// than always resetting to "everything checked."
+		seedCfg, _ := LoadConfig(root)
+		w, err := runInitWizard(filepath.Base(root), toStringList(seedCfg["adapters"]))
 		if err != nil {
 			return 0, err
 		}
@@ -179,12 +223,16 @@ func cmdInit(args []string, stdout, _ io.Writer) (int, error) {
 			// User aborted the wizard (Ctrl-C/Esc) — SIGINT exit-code convention.
 			return 130, nil
 		}
-		name, summary = w.name, w.summary
+		name, summary, agents = w.name, w.summary, w.agents
+		agentsChosen = true
 	}
 	if name == "" {
 		name = filepath.Base(root)
 	}
-	result, err := RunInit(root, name, summary, p.force)
+	if !agentsChosen {
+		agents = adapterOrder
+	}
+	result, err := RunInit(root, name, summary, agents, p.force)
 	if err != nil {
 		return 0, err
 	}
@@ -211,6 +259,25 @@ func cmdInit(args []string, stdout, _ io.Writer) (int, error) {
 		}
 	}
 	fmt.Fprintf(stdout, "\nMa'at initialized in %s\n", root)
+	if agentsChosen && contains(result.Skipped, ".maat.yml") {
+		// .maat.yml already existed and was preserved untouched (like any
+		// other scaffold file), so a newly-chosen agent not already in its
+		// adapters: list needs a hand-edit + sync — Ma'at has no YAML
+		// emitter to splice it in automatically (see ADR 0002/0011).
+		if cfg, cErr := LoadConfig(root); cErr == nil {
+			existing := toStringList(cfg["adapters"])
+			var missing []string
+			for _, a := range agents {
+				if !contains(existing, a) {
+					missing = append(missing, "`"+a+"`")
+				}
+			}
+			if len(missing) > 0 {
+				fmt.Fprintf(stdout, "\nTo also generate adapter files for %s, add %s to `adapters:` in .maat.yml, then run `maat sync`.\n",
+					strings.Join(missing, ", "), strings.Join(missing, ", "))
+			}
+		}
+	}
 	if len(result.Skipped) > 0 {
 		// Brownfield adoption (ADR 0008): pre-existing files were preserved,
 		// so the scaffold is incomplete by design. Tell the user what that
