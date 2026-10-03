@@ -217,9 +217,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: getmaat/maat@v0.4.0
+      - uses: getmaat/maat@v0.6.0
         with:
-          version: "0.4.0"
+          version: "0.6.0"
 ```
 
 Make this job required if you want documentation drift to block merges.
