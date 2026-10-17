@@ -18,6 +18,7 @@ Copy [`_template.md`](_template.md) to `NNNN-short-title.md` (next number).
 
 Newest first:
 
+- [0012 Detect staleness from git history](0012-git-aware-staleness.md)
 - [0011 Build-time Go dependencies are permitted; runtime dependencies are not](0011-build-time-go-dependencies.md)
 - [0010 Hand-copy templates live under .maat/, not the repo root](0010-templates-under-dot-maat.md)
 - [0009 Maintenance contract as a managed block in the instruction file](0009-contract-as-managed-block.md)
@@ -25,7 +26,7 @@ Newest first:
 - [0007 Agent skills as managed artifacts](0007-agent-skills-as-managed-artifacts.md)
 - [0006 Distribution and version pinning](0006-distribution-and-versioning.md)
 - [0005 Rewrite the CLI in Go, distribute a single static binary](0005-go-rewrite.md)
-- [0004 Detect staleness via related_code timestamps](0004-related-code-staleness.md)
+- [0004 Detect staleness via related_code timestamps](0004-related-code-staleness.md) *(deprecated — superseded by 0012)*
 - [0003 AGENTS.md as the source of truth, with generated adapters](0003-agents-md-source-of-truth.md)
 - [0002 Zero runtime dependencies](0002-zero-dependencies.md) *(deprecated — superseded by 0005)*
 - [0001 Record architecture decisions](0001-record-architecture-decisions.md)

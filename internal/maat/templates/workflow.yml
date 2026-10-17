@@ -13,6 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history: staleness compares commit order, which a shallow
+          # clone cannot see.
+          fetch-depth: 0
 
       - name: Install Ma'at
         # Downloads a released static binary (macOS/Linux) — no Go required.

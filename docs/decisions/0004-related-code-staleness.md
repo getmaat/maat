@@ -1,15 +1,21 @@
 ---
 title: 0004 Detect staleness via related_code timestamps
-status: current
-summary: Docs declare the source files they describe; check compares mtimes to flag docs that may lag behind code.
+status: deprecated
+summary: Superseded by ADR 0012. Staleness now uses git history; the mtime comparison remains only as the fallback for non-git directories.
 related_code:
   - internal/maat/check.go
 ---
 
 # 0004. Detect staleness via `related_code` timestamps
 
-- **Status:** accepted
+- **Status:** deprecated — superseded by [0012 Detect staleness from git history](0012-git-aware-staleness.md)
 - **Date:** 2026-07-02
+
+> **Superseded (2026-10-17).** `related_code` and the orphaned-code check stand
+> as decided here. The mtime comparison is no longer the primary staleness
+> signal: inside a git work tree, `check` compares commit order instead (ADR
+> 0012). mtimes are used only for plain directories or with
+> `check.staleness_source: mtime`.
 
 ## Context
 

@@ -217,6 +217,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history, so staleness can compare commits
       - uses: getmaat/maat@v0.6.0
         with:
           version: "0.6.0"

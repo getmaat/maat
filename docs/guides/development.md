@@ -163,7 +163,10 @@ maintained in this repo (see
 
 - Build-time-only Go module dependencies are fine (they compile into the
   static binary); no runtime process, network call, or subprocess dependency
-  — see [ADR 0011](../decisions/0011-build-time-go-dependencies.md).
+  — see [ADR 0011](../decisions/0011-build-time-go-dependencies.md). The one
+  exception is *optional* use of the `git` command for staleness detection,
+  which must always degrade gracefully when git is absent
+  ([ADR 0012](../decisions/0012-git-aware-staleness.md)).
 - Keep generators pure (no I/O); all disk writes live in `sync.go`.
 - Match the existing module boundaries; see
   [conventions](../meta/conventions.md).

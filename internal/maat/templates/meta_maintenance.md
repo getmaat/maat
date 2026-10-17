@@ -30,7 +30,8 @@ This documentation is kept current by three actors and one tool.
 
 ## Staleness detection
 
-When a doc declares `related_code`, `maat check` compares modification
-times. If the code is newer than the doc, it flags the doc for review. After
-refreshing the doc, re-save it (or run `maat sync`) so its timestamp
-advances.
+When a doc declares `related_code`, `maat check` flags the doc for review if
+that code changed after the doc was last updated. In a git repository this is
+judged from commit history (plus uncommitted edits), so update the doc in the
+same change as the code. CI needs full history (`fetch-depth: 0`). Outside
+git, `check` compares file modification times instead.

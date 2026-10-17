@@ -43,11 +43,13 @@ configurable via `statuses`.
 
 Paths are relative to the repository root and point at the source this document
 describes. They power two checks (see
-[ADR 0004](../decisions/0004-related-code-staleness.md)):
+[ADR 0004](../decisions/0004-related-code-staleness.md) and
+[ADR 0012](../decisions/0012-git-aware-staleness.md)):
 
 - **orphaned_code** — the path no longer exists (error by default).
-- **staleness** — the source file is newer than this doc (warning by default;
-  error under `--strict`).
+- **staleness** — the source changed after this doc was last updated (judged
+  from git history, or file mtimes outside git; warning by default, error
+  under `--strict`).
 
 List the files a reader of this doc would need to keep in sync with it. Omit
 the field entirely for docs that do not describe specific source files (guides,

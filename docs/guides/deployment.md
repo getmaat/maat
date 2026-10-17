@@ -75,10 +75,18 @@ binary via the universal script and runs `maat check` on every pull request.
 On GitHub, the shortest wiring is the published composite action:
 
 ```yaml
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 0     # full history, so staleness can compare commits
 - uses: getmaat/maat@v0.2.0
   with:
     version: "0.2.0"   # optional; omit to track the latest release
 ```
+
+Check out **full history** (`fetch-depth: 0`). Staleness is judged from git
+commit order ([ADR 0012](../decisions/0012-git-aware-staleness.md)); in a
+shallow clone `check` cannot see older commits and warns about it. The
+generated workflow and the reusable workflow below already do this.
 
 An org with many repos can instead call the reusable workflow so the runner,
 checkout, and flags live in one place:

@@ -42,6 +42,7 @@ check:
   broken_links_is_error: true
   drift_is_error: true
   staleness: warn          # off | warn | error
+  staleness_source: auto   # auto | git | mtime
   ignore_code_paths: []
 ```
 
@@ -120,4 +121,5 @@ released), so a typo surfaces immediately. Keep this value in step with the
 | `broken_links_is_error` | `true` | Broken internal link fails the build |
 | `drift_is_error` | `true` | A generated file out of sync fails the build |
 | `staleness` | `warn` | `off` \| `warn` \| `error` for code-newer-than-doc |
+| `staleness_source` | `auto` | How staleness is detected: `git` (commit order + uncommitted changes; error if not a git work tree), `mtime` (file timestamps), or `auto` (git when available, else mtime). See [ADR 0012](../decisions/0012-git-aware-staleness.md) |
 | `ignore_code_paths` | `[]` | Path prefixes exempt from staleness/orphan checks |

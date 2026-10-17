@@ -79,6 +79,7 @@ func defaultConfig() map[string]any {
 			"broken_links_is_error":  true,
 			"drift_is_error":         true,
 			"staleness":              "warn",
+			"staleness_source":       "auto",
 			"ignore_code_paths":      []any{},
 		},
 	}
@@ -139,6 +140,10 @@ func validateConfig(cfg map[string]any) error {
 	staleness := checkStr(cfg, "staleness", "")
 	if staleness != "off" && staleness != "warn" && staleness != "error" {
 		return fmt.Errorf("check.staleness must be off|warn|error, got %s", pyRepr(staleness))
+	}
+	source := checkStr(cfg, "staleness_source", "")
+	if source != "auto" && source != "git" && source != "mtime" {
+		return fmt.Errorf("check.staleness_source must be auto|git|mtime, got %s", pyRepr(source))
 	}
 	// maat_version is optional; when present it must be a well-formed
 	// constraint so a typo fails fast for every build (including dev builds
