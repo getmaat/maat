@@ -20,14 +20,18 @@ file — put your prose outside the managed region.
 
 ## `check` reports **staleness** but the doc is actually current
 
-Staleness is an mtime heuristic (see
-[ADR 0004](../decisions/0004-related-code-staleness.md)): the code file is
-newer than the doc. If you have reviewed the doc and it is correct, re-save it
-so its timestamp advances:
+In a git repository, staleness means a commit after the doc's last change
+touched one of its `related_code` paths (see
+[ADR 0012](../decisions/0012-git-aware-staleness.md)). Review the doc, and
+update it in the same change as the code — a commit that touches the doc
+clears the finding. Touching the file's timestamp no longer does.
 
-```bash
-maat sync     # or just touch/re-save the doc file
-```
+If `check` also warns that **git history is shallow**, CI checked out only the
+latest commit. Use `actions/checkout` with `fetch-depth: 0`.
+
+Outside git (or with `check.staleness_source: mtime`), staleness is the old
+mtime heuristic: the code file is newer than the doc. Re-save the reviewed doc
+so its timestamp advances (`maat sync` does this).
 
 If a path should never trigger staleness (generated code, vendored files), add
 it to `check.ignore_code_paths` in `.maat.yml`.

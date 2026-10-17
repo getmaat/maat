@@ -43,6 +43,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Full history: staleness compares commit order (ADR 0012).
+          fetch-depth: 0
 
       - name: Ma'at check
         uses: getmaat/maat@v1

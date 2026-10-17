@@ -5,6 +5,9 @@
 #
 # Usage in a repo's workflow:
 #
+#   - uses: actions/checkout@v4
+#     with:
+#       fetch-depth: 0                     # full history for staleness (ADR 0012)
 #   - uses: getmaat/maat@v0.2.0          # or actions/checkout of this repo
 #     with:
 #       version: 0.2.0                     # optional; defaults to latest

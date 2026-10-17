@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history: staleness compares commit order (ADR 0012).
+          fetch-depth: 0
       - uses: actions/setup-go@v5
         with:
           go-version: "1.24"

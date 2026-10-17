@@ -2,7 +2,6 @@ package maat
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -91,6 +90,24 @@ func checkRelatedCode(model *DocsModel, cfg map[string]any) []Finding {
 	staleMode := checkStr(cfg, "staleness", "warn")
 	ignore := toStringList(checkVal(cfg, "ignore_code_paths"))
 	var findings []Finding
+
+	var probe stalenessProbe
+	if staleMode != "off" {
+		p, shallow, err := newStalenessProbe(model.Root, checkStr(cfg, "staleness_source", "auto"))
+		if err != nil {
+			findings = append(findings, Finding{"error", "staleness", configFilename, err.Error()})
+			staleMode = "off"
+		} else {
+			probe = p
+			if shallow {
+				findings = append(findings, Finding{staleMode, "staleness", configFilename,
+					"git history is shallow, so commits beyond the clone depth are invisible " +
+						"and stale docs can go undetected — check out full history " +
+						"(actions/checkout: fetch-depth: 0)"})
+			}
+		}
+	}
+
 	for _, doc := range model.Documents {
 		for _, codeRel := range doc.RelatedCode() {
 			if isIgnored(codeRel, ignore) {
@@ -102,28 +119,22 @@ func checkRelatedCode(model *DocsModel, cfg map[string]any) []Finding {
 					"related_code path not found: " + codeRel})
 				continue
 			}
-			if staleMode != "off" && isStale(codePath, doc.Path) {
+			if staleMode != "off" && probe.isStale(codeRel, doc.Rel) {
 				findings = append(findings, Finding{staleMode, "staleness", doc.Rel,
-					fmt.Sprintf("code %s is newer than its doc — review and "+
-						"refresh, then bump the doc's mtime (re-save) "+
-						"or update it", codeRel)})
+					stalenessMessage(probe.name(), codeRel)})
 			}
 		}
 	}
 	return findings
 }
 
-// isStale reports whether the code file is more than 1s newer than its doc.
-func isStale(codePath, docPath string) bool {
-	ci, err := os.Stat(codePath)
-	if err != nil {
-		return false
+func stalenessMessage(source, codeRel string) string {
+	if source == "git" {
+		return fmt.Sprintf("code %s changed after this doc was last updated — "+
+			"review the doc and update it in the same change", codeRel)
 	}
-	di, err := os.Stat(docPath)
-	if err != nil {
-		return false
-	}
-	return ci.ModTime().Sub(di.ModTime()).Seconds() > 1.0
+	return fmt.Sprintf("code %s is newer than its doc (by file mtime) — review and "+
+		"refresh, then bump the doc's mtime (re-save) or update it", codeRel)
 }
 
 func checkDrift(model *DocsModel, cfg map[string]any, root string) []Finding {

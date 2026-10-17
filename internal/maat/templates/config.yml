@@ -31,4 +31,7 @@ check:
   drift_is_error: true
   # off | warn | error — how to treat a doc whose related_code is newer.
   staleness: warn
+  # auto | git | mtime — how staleness is detected. auto uses git history
+  # when available and falls back to file mtimes.
+  staleness_source: auto
   ignore_code_paths: []

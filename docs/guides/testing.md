@@ -25,7 +25,9 @@ The tests exercise the CLI end to end against temporary directories: they run
 The [`Ma'at` workflow](../../.github/workflows/maat.yml) runs on every pull
 request and push to the main branch, as three independent jobs:
 
-- **check** — builds the binary and runs `maat check --format github`. A merge
+- **check** — checks out full history (`fetch-depth: 0`, needed for git-based
+  staleness — [ADR 0012](../decisions/0012-git-aware-staleness.md)), builds
+  the binary and runs `maat check --format github`. A merge
   is blocked if `check` reports any error-severity finding — stale docs,
   broken internal links, missing `related_code` targets, or drifted generated
   files. Fix them by updating the relevant doc and running `maat sync`.

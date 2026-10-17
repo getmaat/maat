@@ -41,5 +41,6 @@ carrying `title`, `status`, `summary`, and optional `related_code`.
 **`related_code`** — a front-matter list naming the source files a doc
 describes; powers staleness and orphaned-code detection.
 
-**Staleness** — a doc whose `related_code` source file has a newer modification
-time, suggesting the doc may not reflect the current code.
+**Staleness** — a doc whose `related_code` source changed after the doc was
+last updated (per git history, or file mtimes outside git), suggesting the doc
+may not reflect the current code.
