@@ -67,7 +67,8 @@ consumes:
   identity (below) it forms the global address `owner/repo#id`.
 - **`kind`** is free-form so Ma'at stays language- and protocol-agnostic.
   Suggested values: `http-api`, `grpc-api`, `event`, `schema`, `library`,
-  `cli`. It is descriptive only and changes no check.
+  `cli`. It is descriptive only and changes no check, so an enum would add
+  friction without catching anything.
 - **`version`** is plain semver, parsed with the existing `semver.go`.
 - **`spec`** points at an OpenAPI/AsyncAPI/JSON-Schema/proto file. Ma'at does
   not interpret it. It is validated like a `related_code` path (must exist) and
@@ -83,8 +84,17 @@ consumes:
 A new optional `.maat.yml` key, `repo: owner/name`, names the repository in
 global addresses. It is optional in this release (recorded as `null` in the
 manifest when absent) and becomes required only once cross-repo resolution
-exists. It is configured, not derived from the git remote, so it is stable
-across forks, mirrors and CI checkouts.
+exists.
+
+It is **configured, never derived at runtime**. A fallback to the git
+`origin` remote would make the identity depend on where `check` runs: a fork,
+a mirror or a CI checkout with a rewritten remote would each produce a
+different `repo`, so the generated manifest would differ between machines and
+the drift check would flip-flop. An identity other repositories point at must
+be a committed fact. For convenience, `maat init` **pre-fills** `repo` once
+from the `origin` remote when it can parse it; the value is written to
+`.maat.yml`, reviewed and committed like any other change, and never
+re-derived afterwards.
 
 ### 3. A generated manifest at `.maat/manifest.json`
 
@@ -185,10 +195,11 @@ independently of this ADR.
   and leaves no room for `kind` or `spec`. Rejected in favor of plain YAML
   mappings, which also forces the parser fix that is needed anyway.
 
-## Open questions for review
+## Resolved during review
 
-1. Should `kind` be an enum (checked) instead of free-form?
-2. Is `.maat/manifest.json` the right fixed location, or should it sit at the
-   repo root (e.g. `maat.json`) for even easier discovery?
-3. Should `repo` fall back to the git `origin` remote when unset, accepting
-   that forks and mirrors produce different identities?
+1. **`kind`: free-form, not an enum.** It drives no check; see Decision §1.
+2. **Manifest location: `.maat/manifest.json`.** Keeps Ma'at's footprint in
+   adopting repositories inside the directory it already owns, instead of
+   adding another root-level file; see Decision §3.
+3. **`repo`: configured, pre-filled by `init`, never derived at runtime.**
+   See Decision §2.
