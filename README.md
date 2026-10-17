@@ -219,9 +219,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0   # full history, so staleness can compare commits
-      - uses: getmaat/maat@v0.6.0
+      - uses: getmaat/maat@v0.7.0
         with:
-          version: "0.6.0"
+          version: "0.7.0"
 ```
 
 Make this job required if you want documentation drift to block merges.
