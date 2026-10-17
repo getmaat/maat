@@ -22,9 +22,11 @@ that Ma'at's front-matter and `.maat.yml` actually use, and nothing more.
 
 - `internal/maat/yaml.go` — a small recursive parser for a YAML subset:
   scalars (with `int`/`float`/`bool`/`null` coercion), quoted strings, flow
-  lists (`[a, b]`), block lists (`- item`), and nested mappings by
-  indentation. Exposes `yamlParse(text) (any, error)`. The tool only ever
-  *reads* YAML, so there is no emitter.
+  lists (`[a, b]`), block lists (`- item`, indented under their key or at the
+  same indentation as it), nested mappings by indentation, and lists of
+  mappings (`- id: x` followed by keys aligned with `id`, or a bare `-` with
+  the mapping on the following lines). Exposes `yamlParse(text) (any, error)`.
+  The tool only ever *reads* YAML, so there is no emitter.
 - `internal/maat/frontmatter.go` — splits a Markdown file into its
   `---`-delimited front-matter block and body. Exposes
   `fmSplit(text) (meta map[string]any, body string, err error)` and the
@@ -39,6 +41,12 @@ that Ma'at's front-matter and `.maat.yml` actually use, and nothing more.
 - Malformed front-matter **is** an error (`FrontMatterError`): a `---` fence
   that opens but never closes, or a block that parses to something other than
   a mapping. Failing loudly lets authors notice typos early.
+- **The parser never drops input silently.** Every line must belong to the
+  parsed structure; a line it cannot place (mis-indented, or an unsupported
+  construct such as a `|`/`>` block scalar) is a `YAMLError` naming the line
+  number. Constructs it does not interpret but can hold as text — a value
+  starting with `{`, `&` or `*`, for example — are kept as plain strings, so
+  template placeholders such as `{{PROJECT}}` keep working.
 - Parsing is read-only and deterministic: Ma'at never re-emits parsed YAML.
   Generated Markdown is produced by templating and spliced between managed
   markers, so front-matter the tool did not author is preserved verbatim and
