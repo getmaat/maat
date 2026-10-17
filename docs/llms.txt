@@ -38,11 +38,18 @@ This file indexes the project's documentation for AI agents and tools. Each link
 - [Configuration reference](docs/reference/configuration.md): Every .maat.yml key, its default, and its effect.
 - [Environment variables](docs/reference/environment.md): Environment variables Ma'at reads.
 - [Front-matter reference](docs/reference/frontmatter.md): The YAML front-matter schema every doc in docs/ carries.
+- [Contract manifest reference](docs/reference/manifest.md): The format of .maat/manifest.json, the generated index of a repository's contract edges.
 
 ## Meta — conventions and glossary
 - [Documentation conventions](docs/meta/conventions.md): The rules this documentation set follows so it stays consistent.
 - [Glossary](docs/meta/glossary.md): Definitions of Ma'at's domain terms.
 - [Maintaining the documentation](docs/meta/maintenance.md): How the docs stay in sync with the code — the lifecycle and tooling.
+
+## Contracts
+- Provides `check-action` (github-action): [Adopting Ma'at in a repository](docs/guides/deployment.md)
+- Provides `check-workflow` (github-workflow): [Adopting Ma'at in a repository](docs/guides/deployment.md)
+- Provides `maat-cli` (cli): [CLI reference](docs/reference/cli.md)
+- Provides `manifest-format` (schema, 1.0.0): [Contract manifest reference](docs/reference/manifest.md)
 
 ## Entry points
 - [Ma'at Documentation](docs/index.md): Entry point and map for the Ma'at documentation set.

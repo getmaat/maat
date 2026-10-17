@@ -61,6 +61,11 @@ func llmsTxt(model *DocsModel, projectName, projectSummary string) string {
 		lines = append(lines, "")
 	}
 
+	// Contract edges (ADR 0013), so agents see the interfaces up front.
+	if section := contractsSection(model); section != "" {
+		lines = append(lines, strings.TrimRight(section, "\n"), "")
+	}
+
 	// Root-level docs (index.md etc.) get their own section.
 	if rootDocs := buckets["_root"]; len(rootDocs) > 0 {
 		lines = append(lines, "## Entry points")

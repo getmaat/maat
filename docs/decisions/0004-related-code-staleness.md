@@ -2,8 +2,6 @@
 title: 0004 Detect staleness via related_code timestamps
 status: deprecated
 summary: Superseded by ADR 0012. Staleness now uses git history; the mtime comparison remains only as the fallback for non-git directories.
-related_code:
-  - internal/maat/check.go
 ---
 
 # 0004. Detect staleness via `related_code` timestamps

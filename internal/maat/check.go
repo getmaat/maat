@@ -109,7 +109,7 @@ func checkRelatedCode(model *DocsModel, cfg map[string]any) []Finding {
 	}
 
 	for _, doc := range model.Documents {
-		for _, codeRel := range doc.RelatedCode() {
+		for _, codeRel := range relatedPaths(doc) {
 			if isIgnored(codeRel, ignore) {
 				continue
 			}
@@ -126,6 +126,18 @@ func checkRelatedCode(model *DocsModel, cfg map[string]any) []Finding {
 		}
 	}
 	return findings
+}
+
+// relatedPaths is a doc's related_code plus the spec files its provides entries
+// declare (ADR 0013), without duplicates. Both get orphan and staleness checks.
+func relatedPaths(doc *Document) []string {
+	paths := doc.RelatedCode()
+	for _, spec := range doc.specPaths() {
+		if !contains(paths, spec) {
+			paths = append(paths, spec)
+		}
+	}
+	return paths
 }
 
 func stalenessMessage(source, codeRel string) string {
@@ -175,6 +187,7 @@ func RunAll(model *DocsModel, cfg map[string]any, root string) []Finding {
 	findings = append(findings, checkFrontmatter(model, cfg)...)
 	findings = append(findings, checkLinks(model, cfg)...)
 	findings = append(findings, checkRelatedCode(model, cfg)...)
+	findings = append(findings, checkContracts(model, cfg)...)
 	findings = append(findings, checkDrift(model, cfg, root)...)
 	sort.SliceStable(findings, func(i, j int) bool {
 		si, sj := severityRank(findings[i].Severity), severityRank(findings[j].Severity)
