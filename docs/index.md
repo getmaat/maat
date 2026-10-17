@@ -22,7 +22,7 @@ humans can use the map below.
 - [Check engine module](architecture/modules/check.md) — The validation rules behind `maat check` — the CI gate.
 - [Model & generators module](architecture/modules/model-generate.md) — Scanning the docs tree into a model and rendering derived artifacts from it.
 - [Terminal presentation module](architecture/modules/presentation.md) — TTY/color detection, Lip Gloss styling, and the Huh init wizard layered on top of the plain-text output every command already produces.
-- [YAML & front-matter module](architecture/modules/yaml-frontmatter.md) — The dependency-free parsing layer — a YAML subset and Markdown front-matter I/O.
+- [YAML & front-matter module](architecture/modules/yaml-frontmatter.md) — The parsing layer — a hand-rolled YAML subset and Markdown front-matter reading.
 - [Architecture Overview](architecture/overview.md) — How Ma'at is built — the CLI pipeline, the docs model, and the generate/validate split.
 
 ### Decisions — why it is built that way (ADRs)

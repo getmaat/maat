@@ -1,7 +1,7 @@
 ---
 title: YAML & front-matter module
 status: current
-summary: The dependency-free parsing layer — a YAML subset and Markdown front-matter I/O.
+summary: The parsing layer — a hand-rolled YAML subset and Markdown front-matter reading.
 related_code:
   - internal/maat/yaml.go
   - internal/maat/frontmatter.go
@@ -11,8 +11,8 @@ related_code:
 
 ## Responsibility
 
-Provide just enough YAML to read and write document front-matter **without any
-third-party dependency**. This module is the foundation the rest of Ma'at
+Provide just enough YAML to read document front-matter and `.maat.yml` with a
+small, hand-rolled parser instead of a third-party YAML library. This module is the foundation the rest of Ma'at
 builds on; it is intentionally the only place that touches YAML syntax.
 
 It is **not** a general-purpose YAML implementation. It supports the subset
@@ -28,12 +28,17 @@ that Ma'at's front-matter and `.maat.yml` actually use, and nothing more.
 - `internal/maat/frontmatter.go` — splits a Markdown file into its
   `---`-delimited front-matter block and body. Exposes
   `fmSplit(text) (meta map[string]any, body string, err error)` and the
-  file-reading convenience `fmRead(path)`.
+  file-reading convenience `fmRead(path)`. A leading byte-order mark is
+  tolerated, and the single blank line after the closing fence is dropped
+  from the body.
 
 ## Interfaces / contracts
 
 - `fmSplit("")` returns an empty map and no error — an empty or absent block is
   valid, never an error.
+- Malformed front-matter **is** an error (`FrontMatterError`): a `---` fence
+  that opens but never closes, or a block that parses to something other than
+  a mapping. Failing loudly lets authors notice typos early.
 - Parsing is read-only and deterministic: Ma'at never re-emits parsed YAML.
   Generated Markdown is produced by templating and spliced between managed
   markers, so front-matter the tool did not author is preserved verbatim and
@@ -45,7 +50,10 @@ that Ma'at's front-matter and `.maat.yml` actually use, and nothing more.
 
 - The parser assumes spaces, not tabs, for indentation (as does YAML proper).
 - Only the subset above is supported. If a doc needs a structure the parser
-  does not handle, extend `yaml.go` deliberately and add a test — do not pull in
-  a general-purpose YAML library (see
-  [ADR 0005](../../decisions/0005-go-rewrite.md), which supersedes
-  [ADR 0002](../../decisions/0002-zero-dependencies.md)).
+  does not handle, extend `yaml.go` deliberately and add a test. Build-time Go
+  dependencies are permitted since
+  [ADR 0011](../../decisions/0011-build-time-go-dependencies.md), but that ADR
+  keeps the hand-rolled subset on purpose: front-matter is a small, stable
+  format Ma'at can scope down safely, so a general-purpose YAML library would
+  add surface without benefit. Revisit only if the needed subset grows
+  substantially.
