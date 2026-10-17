@@ -110,6 +110,7 @@ func indentOf(line string) int {
 type yamlLine struct {
 	indent int
 	text   string
+	num    int // 1-based line number in the input, for error messages
 }
 
 type lineReader struct {
@@ -119,7 +120,7 @@ type lineReader struct {
 
 func newLineReader(text string) (*lineReader, error) {
 	lr := &lineReader{}
-	for _, raw := range pySplitlines(text) {
+	for i, raw := range pySplitlines(text) {
 		end := indentOf(raw) + 1
 		if end > len(raw) {
 			end = len(raw)
@@ -131,7 +132,7 @@ func newLineReader(text string) (*lineReader, error) {
 		if strings.TrimSpace(stripped) == "" {
 			continue
 		}
-		lr.rows = append(lr.rows, yamlLine{indent: indentOf(stripped), text: strings.TrimSpace(stripped)})
+		lr.rows = append(lr.rows, yamlLine{indent: indentOf(stripped), text: strings.TrimSpace(stripped), num: i + 1})
 	}
 	return lr, nil
 }
@@ -154,7 +155,7 @@ func parseBlock(lr *lineReader, indent int) (any, error) {
 	if !ok {
 		return nil, nil
 	}
-	if strings.HasPrefix(peek.text, "- ") {
+	if isSeqItem(peek.text) {
 		return parseSequence(lr, indent)
 	}
 	return parseMapping(lr, indent)
@@ -164,15 +165,28 @@ func parseSequence(lr *lineReader, indent int) (any, error) {
 	seq := []any{}
 	for {
 		peek, ok := lr.peek()
-		if !ok || peek.indent != indent || !strings.HasPrefix(peek.text, "- ") {
+		if !ok || peek.indent != indent || !isSeqItem(peek.text) {
 			break
 		}
 		row := lr.next()
-		item := strings.TrimSpace(row.text[2:])
+		item := strings.TrimSpace(row.text[1:])
 		if item != "" {
-			if strings.HasPrefix(item, "[") {
+			switch {
+			case strings.HasPrefix(item, "["):
 				seq = append(seq, flowList(item))
-			} else {
+			case startsMapping(item):
+				// Compact mapping: "- key: value" opens a mapping whose keys
+				// sit at the column where "key" starts. Re-queue the item as
+				// that mapping's first line and parse the rest of it there.
+				col := indent + len(row.text) - len(item)
+				lr.pos--
+				lr.rows[lr.pos] = yamlLine{indent: col, text: item, num: row.num}
+				child, err := parseMapping(lr, col)
+				if err != nil {
+					return nil, err
+				}
+				seq = append(seq, child)
+			default:
 				seq = append(seq, scalar(item))
 			}
 		} else {
@@ -193,7 +207,7 @@ func parseMapping(lr *lineReader, indent int) (any, error) {
 		if !ok || peek.indent != indent {
 			break
 		}
-		if strings.HasPrefix(peek.text, "- ") {
+		if isSeqItem(peek.text) {
 			break
 		}
 		row := lr.next()
@@ -207,7 +221,15 @@ func parseMapping(lr *lineReader, indent int) (any, error) {
 		switch {
 		case rest == "":
 			child, ok := lr.peek()
-			if ok && child.indent > indent {
+			if ok && child.indent == indent && isSeqItem(child.text) {
+				// A block sequence may sit at the same indentation as its
+				// key ("key:" followed by "- item"), which is valid YAML.
+				val, err := parseSequence(lr, indent)
+				if err != nil {
+					return nil, err
+				}
+				mapping[key] = val
+			} else if ok && child.indent > indent {
 				val, err := parseBlock(lr, child.indent)
 				if err != nil {
 					return nil, err
@@ -225,6 +247,23 @@ func parseMapping(lr *lineReader, indent int) (any, error) {
 	return mapping, nil
 }
 
+// isSeqItem reports whether a (trimmed) line is a block-sequence entry: "- x",
+// or a bare "-" whose value follows on the next, more-indented lines.
+func isSeqItem(text string) bool {
+	return text == "-" || strings.HasPrefix(text, "- ")
+}
+
+// startsMapping reports whether a sequence item opens a mapping ("key: value"
+// or "key:"), as opposed to a plain scalar. A colon only separates a key when
+// followed by a space or the end of the item, so "http://example.com" stays a
+// scalar. Quoted items are always scalars.
+func startsMapping(item string) bool {
+	if item == "" || item[0] == '"' || item[0] == '\'' {
+		return false
+	}
+	return strings.Contains(item, ": ") || strings.HasSuffix(item, ":")
+}
+
 // yamlParse parses a YAML-subset document into Go values. An empty document
 // yields an empty mapping, matching the Python parser.
 func yamlParse(text string) (any, error) {
@@ -236,5 +275,16 @@ func yamlParse(text string) (any, error) {
 	if !ok {
 		return map[string]any{}, nil
 	}
-	return parseBlock(lr, first.indent)
+	val, err := parseBlock(lr, first.indent)
+	if err != nil {
+		return nil, err
+	}
+	// Every line must belong to the parsed structure. A line left over here
+	// is mis-indented or uses an unsupported construct; dropping it silently
+	// would lose data, so fail instead.
+	if rest, ok := lr.peek(); ok {
+		return nil, yamlErr("line %d: unexpected indentation or unsupported YAML (such as a | or > block scalar): %s",
+			rest.num, pyRepr(rest.text))
+	}
+	return val, nil
 }
