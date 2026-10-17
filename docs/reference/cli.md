@@ -4,6 +4,9 @@ status: current
 summary: Every maat command, flag, and exit code.
 related_code:
   - internal/maat/cli.go
+provides:
+  - id: maat-cli
+    kind: cli
 ---
 
 # CLI reference

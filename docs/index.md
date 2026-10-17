@@ -39,7 +39,7 @@ humans can use the map below.
 - [0010 Hand-copy templates live under .maat/, not the repo root](decisions/0010-templates-under-dot-maat.md) — init no longer scaffolds a root-level templates/ folder; the redundant ADR copy is dropped in favor of the existing docs/decisions/_template.md, and the module doc template moves to .maat/templates/_module.md, matching the leading-underscore naming already used for the ADR template.
 - [0011 Build-time Go dependencies are permitted; runtime dependencies are not](decisions/0011-build-time-go-dependencies.md) — Go module dependencies that compile statically into the binary (no external runtime process, no network call, no subprocess) are permitted going forward. The Charm libraries (Lip Gloss, Huh, and Bubble Tea transitively via Huh) are the first exercise of this policy, used for terminal styling and an interactive `init` wizard.
 - [0012 Detect staleness from git history](decisions/0012-git-aware-staleness.md) — Staleness compares commit order (and uncommitted changes) via git when available; filesystem mtimes remain only as the fallback for plain directories.
-- [0013 Typed contract edges in front matter and a generated manifest](decisions/0013-contract-edges-and-manifest.md) _(draft)_ — Docs declare the contracts they describe (provides) and depend on (consumes); sync generates a machine-readable manifest at .maat/manifest.json; check validates edges within the repo. Groundwork for cross-repo checks.
+- [0013 Typed contract edges in front matter and a generated manifest](decisions/0013-contract-edges-and-manifest.md) — Docs declare the contracts they describe (provides) and depend on (consumes); sync generates a machine-readable manifest at .maat/manifest.json; check validates edges within the repo. Groundwork for cross-repo checks.
 - [Architecture Decision Records](decisions/README.md) — Index of ADRs — the append-only log of why the system is the way it is.
 
 ### Guides — how to work on it
@@ -55,6 +55,7 @@ humans can use the map below.
 - [Configuration reference](reference/configuration.md) — Every .maat.yml key, its default, and its effect.
 - [Environment variables](reference/environment.md) — Environment variables Ma'at reads.
 - [Front-matter reference](reference/frontmatter.md) — The YAML front-matter schema every doc in docs/ carries.
+- [Contract manifest reference](reference/manifest.md) — The format of .maat/manifest.json, the generated index of a repository's contract edges.
 
 ### Meta — conventions and glossary
 
