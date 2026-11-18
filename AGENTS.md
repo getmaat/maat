@@ -79,7 +79,9 @@ go build -o maat .
 # Validate the docs (this is what CI runs):
 go run . check
 
-# Regenerate derived files after editing docs:
+# Regenerate derived files after editing docs. Always use the source build
+# here, never an installed `maat`: CI expects the "dev" version stamp in
+# generated skills (see docs/guides/development.md).
 go run . sync
 
 # Run the test suite:
