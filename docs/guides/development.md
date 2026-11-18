@@ -68,6 +68,13 @@ pseudo-versioned binary — are **exempt** from that pin, so it never blocks you
 local loop; enforcement applies only to released binaries. See
 [ADR 0006](../decisions/0006-distribution-and-versioning.md).
 
+**Always sync this repository with the source build (`go run . sync`), not
+an installed `maat`.** Generated skills carry a `maat-version:` stamp: a
+release binary writes its version (e.g. `0.8.0`), a source build writes `dev`.
+CI checks this repository with a binary built from source, so the committed
+stamp must be `dev`; syncing with a release binary changes it and CI fails
+with `drift`. If that happens, run `go run . sync` again to restore it.
+
 ## Releasing
 
 Releases are cut by pushing a semantic-version tag. The

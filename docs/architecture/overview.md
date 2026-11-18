@@ -63,20 +63,24 @@ edit to a generated file or a forgotten `sync`.
 | Generators | `internal/maat/generate.go` | Render `llms.txt`, adapter files, index navigation |
 | Sync command | `internal/maat/sync.go` | Compute + write derived artifacts |
 | Check command | `internal/maat/check.go` | Validate front-matter, links, code refs, drift |
+| Staleness probes | `internal/maat/staleness.go` | Decide whether a doc lags its code (git history, mtime fallback) |
+| Contracts | `internal/maat/contracts.go` | Validate `provides`/`consumes` edges, render the manifest |
 | Init + scaffold | `internal/maat/scaffold.go` | Stamp the scaffold into a repo (templates embedded via `//go:embed`) |
 | Config | `internal/maat/config.go` | Load `.maat.yml`, defaults, adapter registry |
 | Front-matter I/O | `internal/maat/frontmatter.go` | Split/join the `---` YAML block in Markdown |
-| YAML subset | `internal/maat/yaml.go` | Dependency-free YAML parser/emitter |
+| YAML subset | `internal/maat/yaml.go` | Hand-rolled, read-only YAML subset parser |
 | Terminal presentation | `internal/maat/tty.go`, `style.go`, `wizard.go` | TTY/color detection, Lip Gloss styling, the Huh `init` wizard |
 | Entry point | `main.go` | `main()` — calls into `internal/maat` |
 
 ## Module index
 
-- [YAML & front-matter](modules/yaml-frontmatter.md) — the dependency-free
+- [YAML & front-matter](modules/yaml-frontmatter.md) — the hand-rolled
   parsing layer everything else is built on.
 - [Model & generators](modules/model-generate.md) — scanning docs and
   rendering derived artifacts.
 - [Check engine](modules/check.md) — the validation rules behind the CI gate.
+- [Init & scaffold](modules/scaffold.md) — what `maat init` stamps out, the
+  embedded templates, and version-dependent values.
 - [Terminal presentation](modules/presentation.md) — TTY/color detection,
   styled output, and the interactive `init` wizard.
 
@@ -86,5 +90,6 @@ The *why* behind this shape is recorded as ADRs:
 
 - [0005 Rewrite the CLI in Go, distribute a single static binary](../decisions/0005-go-rewrite.md)
 - [0003 AGENTS.md as source of truth with generated adapters](../decisions/0003-agents-md-source-of-truth.md)
-- [0004 Detect staleness via related_code timestamps](../decisions/0004-related-code-staleness.md)
+- [0012 Detect staleness from git history](../decisions/0012-git-aware-staleness.md) (supersedes 0004)
+- [0013 Typed contract edges in front matter and a generated manifest](../decisions/0013-contract-edges-and-manifest.md)
 - [0011 Build-time Go dependencies are permitted; runtime dependencies are not](../decisions/0011-build-time-go-dependencies.md)
