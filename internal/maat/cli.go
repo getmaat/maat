@@ -259,6 +259,10 @@ func cmdInit(args []string, stdout, _ io.Writer) (int, error) {
 		}
 	}
 	fmt.Fprintf(stdout, "\nMa'at initialized in %s\n", root)
+	if result.Repo != "" {
+		fmt.Fprintf(stdout, "\nSet repo: %s in .maat.yml from the git origin remote. "+
+			"It identifies this repository in contract refs; check it before committing.\n", result.Repo)
+	}
 	if agentsChosen && contains(result.Skipped, ".maat.yml") {
 		// .maat.yml already existed and was preserved untouched (like any
 		// other scaffold file), so a newly-chosen agent not already in its

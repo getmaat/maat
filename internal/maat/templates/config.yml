@@ -11,6 +11,11 @@ instructions_file: AGENTS.md
 # exempt. Terraform-style operators: "~> 0.1" means >= 0.1.0, < 1.0.0.
 # maat_version: "~> {{MAAT_VERSION}}"
 
+# This repository's identity (owner/name) in contract refs from other repos
+# (ADR 0013). Configured, never re-derived: `maat init` pre-fills it once from
+# the git origin remote when it can; review it before committing.
+{{REPO_LINE}}
+
 # Per-agent adapter files to generate and keep in sync with AGENTS.md.
 # `maat init --agents=...` (or its interactive prompt) sets this list; edit it
 # by hand and re-run `maat sync` to add or remove an agent later.

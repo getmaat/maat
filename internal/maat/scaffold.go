@@ -149,6 +149,55 @@ type InitResult struct {
 	Created   []string
 	Skipped   []string
 	Generated []string
+	// Repo is the identity pre-filled into a freshly written .maat.yml from
+	// the git origin remote, or "" when none was written.
+	Repo string
+}
+
+// repoFromRemote derives "owner/name" from the git origin remote of root, or
+// returns "" when root is not a git work tree, has no origin, or the remote's
+// path is not exactly owner/name (e.g. a GitLab subgroup). Used only once, by
+// init, to pre-fill .maat.yml; the identity is never re-derived at runtime
+// (ADR 0013 §2).
+func repoFromRemote(root string) string {
+	url, err := runGit(root, "remote", "get-url", "origin")
+	if err != nil {
+		return ""
+	}
+	return repoFromURL(url)
+}
+
+// repoFromURL extracts "owner/name" from a git remote URL in any of the
+// common forms: https://host/owner/name(.git), ssh://git@host[:port]/owner/name,
+// and scp-like git@host:owner/name.git.
+func repoFromURL(url string) string {
+	path := strings.TrimSpace(url)
+	if i := strings.Index(path, "://"); i >= 0 {
+		path = path[i+3:]
+		slash := strings.Index(path, "/")
+		if slash < 0 {
+			return ""
+		}
+		path = path[slash+1:] // drop user@host[:port]
+	} else if colon := strings.Index(path, ":"); colon >= 0 && !strings.Contains(path[:colon], "/") {
+		path = path[colon+1:] // scp-like: git@host:owner/name
+	} else {
+		return "" // a local path or something unrecognized
+	}
+	path = strings.TrimSuffix(strings.Trim(path, "/"), ".git")
+	if !repoNameRe.MatchString(path) {
+		return ""
+	}
+	return path
+}
+
+// repoLine renders the config.yml `repo:` line: set when the remote gave an
+// identity, otherwise a commented placeholder.
+func repoLine(repo string) string {
+	if repo == "" {
+		return "# repo: owner/name"
+	}
+	return "repo: " + repo
 }
 
 // RunInit scaffolds Ma'at into root. Existing files are skipped unless force
@@ -176,6 +225,11 @@ func RunInit(root, project, summary string, agents []string, force bool) (*InitR
 		"MAAT_ACTION_REF": scaffoldActionRef(),
 		"ADAPTERS_BLOCK":  adaptersBlock(agents),
 	}
+	repo := ""
+	if force || !pathExists(filepath.Join(root, configFilename)) {
+		repo = repoFromRemote(root)
+	}
+	subs["REPO_LINE"] = repoLine(repo)
 
 	result := &InitResult{}
 	for _, f := range scaffoldFiles {
@@ -198,6 +252,9 @@ func RunInit(root, project, summary string, agents []string, force bool) (*InitR
 			return nil, err
 		}
 		result.Created = append(result.Created, f.rel)
+		if f.rel == configFilename {
+			result.Repo = repo
+		}
 	}
 
 	cfg, err := LoadConfig(root)
