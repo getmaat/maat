@@ -125,6 +125,11 @@ forks, mirrors and CI checkouts all agree on it (see
 [ADR 0013](../decisions/0013-contract-edges-and-manifest.md)). A value that is
 not `owner/name` fails config validation.
 
+`maat init` pre-fills it **once** from the git `origin` remote when it writes a
+new `.maat.yml` and the remote path is exactly `owner/name`; otherwise it
+leaves `# repo: owner/name` as a placeholder. Nested paths such as GitLab
+subgroups (`group/sub/repo`) are not supported as identities yet.
+
 ## `check`
 
 | Key | Default | Effect |

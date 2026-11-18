@@ -44,6 +44,13 @@ scaffolded `.maat/skills/retrospect/SKILL.md` to derive documentation from the
 existing codebase. See
 [ADR 0008](../decisions/0008-brownfield-adoption-byo-agent.md).
 
+When `init` writes a fresh `.maat.yml` inside a git repository whose `origin`
+remote has an `owner/name` path (GitHub-style HTTPS, SSH and `git@host:` URLs),
+it pre-fills `repo: owner/name` and says so, so you can check it before
+committing. Otherwise `repo` is left as a commented placeholder. An existing
+`.maat.yml` is never touched, and `repo` is never re-derived after `init` (see
+[ADR 0013](../decisions/0013-contract-edges-and-manifest.md)).
+
 Even when the instruction file (`AGENTS.md`) already exists and is skipped,
 `init` still splices Ma'at's **maintenance contract** — the documentation
 update protocol, the front-matter schema, and the skills index — into a managed
