@@ -2,6 +2,13 @@
 title: Adopting Ma'at in a repository
 status: current
 summary: How to add Ma'at to an existing project and wire it into CI.
+provides:
+  - id: check-action
+    kind: github-action
+    spec: action.yml
+  - id: check-workflow
+    kind: github-workflow
+    spec: .github/workflows/maat-check.yml
 ---
 
 # Adopting Ma'at in a repository

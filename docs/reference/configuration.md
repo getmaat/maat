@@ -19,6 +19,7 @@ docs_dir: docs
 instructions_file: AGENTS.md
 
 maat_version: "~> 0.1"   # optional: pin the Ma'at version this repo expects
+repo: owner/name         # optional: this repository's identity in contract refs
 
 adapters:
   - claude
@@ -43,6 +44,7 @@ check:
   drift_is_error: true
   staleness: warn          # off | warn | error
   staleness_source: auto   # auto | git | mtime
+  contracts_is_error: true
   ignore_code_paths: []
 ```
 
@@ -113,11 +115,22 @@ released), so a typo surfaces immediately. Keep this value in step with the
 `MAAT_VERSION` your CI installs. See
 [ADR 0006](../decisions/0006-distribution-and-versioning.md).
 
+## `repo`
+
+The repository's identity, `owner/name`, used in contract refs from other
+repositories (`owner/name#id`) and recorded in the generated
+[contract manifest](manifest.md). Optional for now; it is written as `null`
+when unset. It is configured, never derived from the git remote at runtime, so
+forks, mirrors and CI checkouts all agree on it (see
+[ADR 0013](../decisions/0013-contract-edges-and-manifest.md)). A value that is
+not `owner/name` fails config validation.
+
 ## `check`
 
 | Key | Default | Effect |
 |-----|---------|--------|
-| `orphaned_code_is_error` | `true` | Missing `related_code` path fails the build |
+| `orphaned_code_is_error` | `true` | Missing `related_code` (or contract `spec`) path fails the build |
+| `contracts_is_error` | `true` | Contract findings (`contract_schema`, `contract_unresolved`, `contract_version`) fail the build |
 | `broken_links_is_error` | `true` | Broken internal link fails the build |
 | `drift_is_error` | `true` | A generated file out of sync fails the build |
 | `staleness` | `warn` | `off` \| `warn` \| `error` for code-newer-than-doc |

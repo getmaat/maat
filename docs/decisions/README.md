@@ -18,7 +18,7 @@ Copy [`_template.md`](_template.md) to `NNNN-short-title.md` (next number).
 
 Newest first:
 
-- [0013 Typed contract edges in front matter and a generated manifest](0013-contract-edges-and-manifest.md) *(proposed)*
+- [0013 Typed contract edges in front matter and a generated manifest](0013-contract-edges-and-manifest.md)
 - [0012 Detect staleness from git history](0012-git-aware-staleness.md)
 - [0011 Build-time Go dependencies are permitted; runtime dependencies are not](0011-build-time-go-dependencies.md)
 - [0010 Hand-copy templates live under .maat/, not the repo root](0010-templates-under-dot-maat.md)

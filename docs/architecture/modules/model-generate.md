@@ -6,6 +6,7 @@ related_code:
   - internal/maat/model.go
   - internal/maat/generate.go
   - internal/maat/sync.go
+  - internal/maat/contracts.go
 ---
 
 # Model & generators
@@ -20,7 +21,9 @@ under `.maat/skills/` (plus their vendor copies — see
 managed **maintenance-contract block** spliced into the instruction file — the
 documentation update protocol, the front-matter schema, and the skills
 discovery list (see
-[ADR 0009](../../decisions/0009-contract-as-managed-block.md)).
+[ADR 0009](../../decisions/0009-contract-as-managed-block.md)), and the
+**contract manifest** `.maat/manifest.json` (see
+[ADR 0013](../../decisions/0013-contract-edges-and-manifest.md)).
 
 ## Key files
 
@@ -38,6 +41,10 @@ discovery list (see
   0009), plus `splice()` which inserts generated text between
   `<!-- maat:begin -->` / `<!-- maat:end -->` markers without disturbing
   hand-written content around them.
+- `internal/maat/contracts.go` — `collectContracts()` gathers the valid
+  `provides`/`consumes` edges from the model; `manifestJSON()` renders the
+  manifest and `contractsSection()` the `## Contracts` section of `llms.txt`
+  (emitted only when the repo declares edges).
 - `internal/maat/sync.go` — `expectedArtifacts()` composes the generators
   into the full ordered `{path: content}` map; `writeArtifacts()` writes only
   changed files.
@@ -63,6 +70,9 @@ discovery list (see
   markers, skills because they are whole-file owned by Ma'at (ADR 0007).
   Editing either by hand will be reported as drift. Team-authored skills under
   `.maat/skills/` with other names are never touched.
+- The manifest is emitted even when the repository declares no contracts, so
+  its presence never depends on content. Its JSON is sorted and indented, so it
+  diffs cleanly and drift detection is byte-exact.
 - Adapter relative paths depend on the file's directory depth (e.g.
   `.github/copilot-instructions.md` points at `../AGENTS.md`). That math lives
   in `adapterCtx()` in `sync.go`.

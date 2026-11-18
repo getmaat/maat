@@ -1,12 +1,12 @@
 ---
 title: 0013 Typed contract edges in front matter and a generated manifest
-status: draft
+status: current
 summary: Docs declare the contracts they describe (provides) and depend on (consumes); sync generates a machine-readable manifest at .maat/manifest.json; check validates edges within the repo. Groundwork for cross-repo checks.
 ---
 
 # 0013. Typed contract edges in front matter and a generated manifest
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-10-17
 - **Relates to:** [0004](0004-related-code-staleness.md) / [0012](0012-git-aware-staleness.md) (`related_code` and staleness), [0007 Agent skills as managed artifacts](0007-agent-skills-as-managed-artifacts.md) (`.maat/` as the home for tool-owned files)
 

@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "repo": "getmaat/maat",
+  "provides": [
+    {
+      "id": "check-action",
+      "kind": "github-action",
+      "spec": "action.yml",
+      "doc": "docs/guides/deployment.md"
+    },
+    {
+      "id": "check-workflow",
+      "kind": "github-workflow",
+      "spec": ".github/workflows/maat-check.yml",
+      "doc": "docs/guides/deployment.md"
+    },
+    {
+      "id": "maat-cli",
+      "kind": "cli",
+      "doc": "docs/reference/cli.md"
+    },
+    {
+      "id": "manifest-format",
+      "kind": "schema",
+      "version": "1.0.0",
+      "doc": "docs/reference/manifest.md"
+    }
+  ],
+  "consumes": []
+}

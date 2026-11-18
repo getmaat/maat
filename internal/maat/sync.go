@@ -97,6 +97,10 @@ func expectedArtifacts(model *DocsModel, cfg map[string]any, root string) []orde
 	// contract non-destructively, and it self-heals on every sync.
 	existing := readFileOrEmpty(filepath.Join(root, instructions))
 	artifacts = append(artifacts, orderedArtifact{instructions, splice(existing, contractBlock(skillDefs, docsDir))})
+
+	// 6. Contract manifest (ADR 0013) at a fixed path under .maat/, so other
+	// repositories and tools can always find it. Emitted even when empty.
+	artifacts = append(artifacts, orderedArtifact{manifestPath, manifestJSON(model, cfg)})
 	return artifacts
 }
 

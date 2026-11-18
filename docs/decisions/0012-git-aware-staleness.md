@@ -2,9 +2,6 @@
 title: 0012 Detect staleness from git history
 status: current
 summary: Staleness compares commit order (and uncommitted changes) via git when available; filesystem mtimes remain only as the fallback for plain directories.
-related_code:
-  - internal/maat/staleness.go
-  - internal/maat/check.go
 ---
 
 # 0012. Detect staleness from git history

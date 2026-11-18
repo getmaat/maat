@@ -80,6 +80,7 @@ func defaultConfig() map[string]any {
 			"drift_is_error":         true,
 			"staleness":              "warn",
 			"staleness_source":       "auto",
+			"contracts_is_error":     true,
 			"ignore_code_paths":      []any{},
 		},
 	}
@@ -140,6 +141,11 @@ func validateConfig(cfg map[string]any) error {
 	staleness := checkStr(cfg, "staleness", "")
 	if staleness != "off" && staleness != "warn" && staleness != "error" {
 		return fmt.Errorf("check.staleness must be off|warn|error, got %s", pyRepr(staleness))
+	}
+	if repo, ok := cfg["repo"]; ok && repo != nil {
+		if s, isStr := repo.(string); !isStr || !repoNameRe.MatchString(strings.TrimSpace(s)) {
+			return fmt.Errorf("repo must be \"owner/name\", got %s", pyRepr(AnyToStr(repo)))
+		}
 	}
 	source := checkStr(cfg, "staleness_source", "")
 	if source != "auto" && source != "git" && source != "mtime" {
@@ -203,6 +209,10 @@ func adaptersFor(cfg map[string]any) []resolvedAdapter {
 }
 
 // checkBool reads a boolean from the nested check map, falling back to def.
+// Every current *_is_error key happens to default to true; def stays a
+// parameter so a future key can default to false.
+//
+//nolint:unparam
 func checkBool(cfg map[string]any, key string, def bool) bool {
 	check, _ := cfg["check"].(map[string]any)
 	if check == nil {
