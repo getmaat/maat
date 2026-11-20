@@ -71,6 +71,16 @@ resetting it. See
 [ADR 0011](../decisions/0011-build-time-go-dependencies.md) and the
 [terminal presentation module](../architecture/modules/presentation.md).
 
+When the wizard runs and the repository has a `README.md` that does not yet
+show it, the last question offers to add a **docs badge**
+(`docs | checked by maat`, a static shields.io image linking to Ma'at). If you
+accept, the badge goes on its own line below the README's title heading (or at
+the top when there is none), and `init` lists `README.md` as `update`. `init`
+never creates a README, never asks twice, and never edits one without that
+explicit yes. Every other run of `init`, including all non-interactive ones,
+leaves `README.md` alone and only prints the badge snippet to paste, unless the
+README already has it.
+
 `--agents`/the wizard only ever *write* `.maat.yml` when it doesn't already
 exist — like every other scaffold file, an existing `.maat.yml` is preserved
 untouched (see above). If you choose an agent that isn't already in an

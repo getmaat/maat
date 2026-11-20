@@ -46,13 +46,16 @@ existed (see [ADR 0011](../../decisions/0011-build-time-go-dependencies.md)).
   are never touched — `styledFindingLine` in `style.go` is a parallel
   function, not a rewrite, and `--format github` is never routed through
   color regardless of TTY/env state.
-- `runInitWizard` returns `wizardResult{name, summary string; agents []string;
-  ok bool}`; `ok == false` with a `nil` error means the user aborted the form
+- `runInitWizard(defaultName, defaultAgents, offerBadge)` returns
+  `wizardResult{name, summary string; agents []string; badge, ok bool}`; `ok == false` with a `nil` error means the user aborted the form
   (`huh.ErrUserAborted`) — `cmdInit` maps that to exit code `130`, not an
   error. The multi-select's initial checked state is seeded from the
   caller-supplied `defaultAgents` (the repo's current `adapters:`, or every
   adapter for a fresh repo) — see [configuration reference:
-  adapters](../../reference/configuration.md#adapters).
+  adapters](../../reference/configuration.md#adapters). `offerBadge` adds a
+  final yes/no question about the README docs badge (see
+  [Init & scaffold](scaffold.md)); `badge` is only ever true when it was
+  offered.
 
 ## Gotchas
 

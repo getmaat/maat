@@ -16,6 +16,9 @@
   <a href="LICENSE">
     <img src="https://img.shields.io/github/license/getmaat/maat" alt="License">
   </a>
+  <a href="https://github.com/getmaat/maat">
+    <img src="https://img.shields.io/badge/docs-checked_by_maat-03cdb4" alt="Docs checked by Ma'at">
+  </a>
 </p>
 
 ---
@@ -51,6 +54,12 @@ maat check
 ```
 
 `maat init` is safe to re-run and never overwrites files you already have. If your repository already has an `AGENTS.md`, Ma'at keeps your prose and adds its maintenance rules in a clearly marked managed block.
+
+Run interactively, `init` also offers to add a "docs checked by maat" badge to your README; otherwise it prints the line to paste:
+
+```markdown
+[![Docs checked by Ma'at](https://img.shields.io/badge/docs-checked_by_maat-03cdb4)](https://github.com/getmaat/maat)
+```
 
 ---
 

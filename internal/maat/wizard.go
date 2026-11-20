@@ -13,6 +13,7 @@ type wizardResult struct {
 	name    string
 	summary string
 	agents  []string
+	badge   bool // add the docs badge to README.md (only asked when offerBadge)
 	ok      bool
 }
 
@@ -22,10 +23,13 @@ type wizardResult struct {
 // passes the repo's current adapters: list (or adapterOrder, i.e. every
 // agent, for a fresh repo) so a re-init reflects what's already configured
 // rather than always resetting to "everything checked."
+// offerBadge adds a final yes/no question about inserting the docs badge into
+// README.md; the caller sets it only when a README.md exists without one.
 // It is a var so tests can inject a canned result without driving a real
 // terminal UI.
-var runInitWizard = func(defaultName string, defaultAgents []string) (wizardResult, error) {
+var runInitWizard = func(defaultName string, defaultAgents []string, offerBadge bool) (wizardResult, error) {
 	var name, summary string
+	badge := true
 	agents := append([]string{}, defaultAgents...)
 
 	agentOptions := make([]huh.Option[string], 0, len(adapterOrder))
@@ -35,7 +39,7 @@ var runInitWizard = func(defaultName string, defaultAgents []string) (wizardResu
 
 	// One field per group so the form paginates — name, then summary, then
 	// the agent picker — instead of showing all three stacked on one screen.
-	form := huh.NewForm(
+	groups := []*huh.Group{
 		huh.NewGroup(
 			huh.NewInput().
 				Title("Project name").
@@ -55,7 +59,16 @@ var runInitWizard = func(defaultName string, defaultAgents []string) (wizardResu
 				Options(agentOptions...).
 				Value(&agents),
 		),
-	).WithTheme(huh.ThemeCharm())
+	}
+	if offerBadge {
+		groups = append(groups, huh.NewGroup(
+			huh.NewConfirm().
+				Title("Add a \"docs checked by Ma'at\" badge to README.md?").
+				Description("One line below the title, linking to Ma'at. You can remove it any time.").
+				Value(&badge),
+		))
+	}
+	form := huh.NewForm(groups...).WithTheme(huh.ThemeCharm())
 
 	if err := runForm(form); err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
@@ -71,7 +84,7 @@ var runInitWizard = func(defaultName string, defaultAgents []string) (wizardResu
 	if name == "" {
 		name = defaultName
 	}
-	return wizardResult{name: name, summary: summary, agents: agents, ok: true}, nil
+	return wizardResult{name: name, summary: summary, agents: agents, badge: offerBadge && badge, ok: true}, nil
 }
 
 // runForm isolates form.Run() behind a recover(): Huh v1.0.0 has at least
