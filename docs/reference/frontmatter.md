@@ -86,8 +86,12 @@ consumes:
   reads them as numbers, and `check` reports them instead of guessing.
 - Same-repo refs are checked: they must resolve to a `provides` entry
   (`contract_unresolved`) whose version satisfies the constraint
-  (`contract_version`). Cross-repo refs are recorded in the manifest but not
-  resolved yet.
+  (`contract_version`).
+- Cross-repo refs (`owner/repo#id`) are checked against the committed
+  [contracts lockfile](contracts-lock.md), offline. The repository needs a
+  `contracts.sources` entry in `.maat.yml`, and `maat contracts update`
+  refreshes the lockfile. A ref to this repository's own `repo` resolves
+  locally.
 - Malformed entries (missing `id`/`ref`, unknown keys, bad versions,
   duplicate ids) are reported as `contract_schema`.
 

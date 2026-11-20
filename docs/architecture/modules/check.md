@@ -6,6 +6,7 @@ related_code:
   - internal/maat/check.go
   - internal/maat/staleness.go
   - internal/maat/contracts.go
+  - internal/maat/lockfile.go
 ---
 
 # Check engine
@@ -25,6 +26,10 @@ objects. This is what `maat check` runs and what CI gates merges on.
 - `internal/maat/contracts.go` — collects and validates `provides`/`consumes`
   contract edges (`checkContracts`) and renders the manifest
   ([ADR 0013](../../decisions/0013-contract-edges-and-manifest.md)).
+- `internal/maat/lockfile.go` — `contracts.sources` validation, the lockfile
+  format, and `checkCrossRepo`, which resolves cross-repo refs against the
+  lockfile offline
+  ([ADR 0014](../../decisions/0014-cross-repo-contracts-via-lockfile.md)).
 
 ## The rules
 
@@ -34,10 +39,10 @@ objects. This is what `maat check` runs and what CI gates merges on.
 | `broken_link` | error | A relative Markdown link whose target file is absent |
 | `orphaned_code` | error | A `related_code` path or contract `spec` that no longer exists |
 | `staleness` | warn | A `related_code` path changed after its doc was last updated (git), or has a newer mtime (non-git fallback) |
-| `drift` | error | A generated file that differs from what `sync` would write |
-| `contract_schema` | error | A malformed `provides`/`consumes` entry, or a duplicate contract id |
-| `contract_unresolved` | error | A same-repo `consumes` ref that no doc provides |
-| `contract_version` | error | A same-repo `consumes` constraint the provided version does not satisfy (or that has no version to check) |
+| `drift` | error | A generated file that differs from what `sync` would write, or a contracts lockfile that no longer matches the declared refs and sources |
+| `contract_schema` | error | A malformed `provides`/`consumes` entry, a duplicate contract id, or a cross-repo ref without a configured source |
+| `contract_unresolved` | error | A `consumes` ref that nothing provides (in this repo, or in the provider's locked manifest) |
+| `contract_version` | error | A `consumes` constraint the provided version does not satisfy (or that has no version to check) |
 
 Severities are configurable in `.maat.yml` under `check:`. `--strict`
 promotes `staleness` to an error (useful for a stricter CI lane).
@@ -60,8 +65,11 @@ promotes `staleness` to an error (useful for a stricter CI lane).
   `.maat.yml`) and CI should use `fetch-depth: 0`.
 - A contract's `spec` file gets the same orphan and staleness checks as a
   `related_code` path.
-- Cross-repo `consumes` refs (`owner/repo#id`) are validated for syntax only;
-  resolving them against other repositories is future work.
+- Cross-repo `consumes` refs (`owner/repo#id`) are resolved against the
+  committed lockfile, never the network: `check` stays deterministic, and a
+  provider's change only appears after `maat contracts update`. Lockfile
+  `drift` uses the `drift_is_error` severity; the other contract rules use
+  `contracts_is_error`.
 - Outside git, staleness falls back to filesystem mtimes with a 1-second
   tolerance; re-save a refreshed doc so its mtime advances past the code's.
 - Git runs as an external command; without it, `auto` mode silently uses mtimes.

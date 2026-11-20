@@ -15,6 +15,12 @@
       "doc": "docs/guides/deployment.md"
     },
     {
+      "id": "contracts-lockfile-format",
+      "kind": "schema",
+      "version": "1.0.0",
+      "doc": "docs/reference/contracts-lock.md"
+    },
+    {
       "id": "maat-cli",
       "kind": "cli",
       "doc": "docs/reference/cli.md"

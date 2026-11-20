@@ -55,6 +55,7 @@ humans can use the map below.
 
 - [CLI reference](reference/cli.md) — Every maat command, flag, and exit code.
 - [Configuration reference](reference/configuration.md) — Every .maat.yml key, its default, and its effect.
+- [Contracts lockfile reference](reference/contracts-lock.md) — The format of .maat/contracts.lock.json, the committed snapshot of the contracts a repository consumes from other repositories, and how check uses it.
 - [Environment variables](reference/environment.md) — Environment variables Ma'at reads.
 - [Front-matter reference](reference/frontmatter.md) — The YAML front-matter schema every doc in docs/ carries.
 - [Contract manifest reference](reference/manifest.md) — The format of .maat/manifest.json, the generated index of a repository's contract edges.

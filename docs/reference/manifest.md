@@ -69,3 +69,11 @@ always be found at the same place in any repository that uses Ma'at.
   declared.
 - Keys may be added in later versions without changing `schema`; consumers
   should ignore keys they do not know.
+
+## Who reads it
+
+Other repositories that consume this one's contracts read the manifest with
+`maat contracts update`, and record the parts they use in their own
+[contracts lockfile](contracts-lock.md). Changing a contract's `version` or
+removing it is therefore visible to consumers on their next update; keep
+versions meaningful.

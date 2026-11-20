@@ -130,6 +130,26 @@ new `.maat.yml` and the remote path is exactly `owner/name`; otherwise it
 leaves `# repo: owner/name` as a placeholder. Nested paths such as GitLab
 subgroups (`group/sub/repo`) are not supported as identities yet.
 
+## `contracts`
+
+Where to find the manifests of other repositories this one consumes contracts
+from (see [ADR 0014](../decisions/0014-cross-repo-contracts-via-lockfile.md)):
+
+```yaml
+contracts:
+  sources:
+    getmaat/ledger:          # no value: GitHub, default branch
+    getmaat/billing:
+      ref: release
+```
+
+Each key under `sources` is an `owner/name`; its value is empty or a mapping
+of `ref`, `url` (an `https://` template with `{repo}` and `{ref}`) and `path`
+(a local checkout). Every repository named in a cross-repo `consumes` ref
+needs an entry. Malformed sources fail config validation. The full format and
+the lockfile it produces are in the
+[contracts lockfile reference](contracts-lock.md).
+
 ## `check`
 
 | Key | Default | Effect |

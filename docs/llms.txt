@@ -38,6 +38,7 @@ This file indexes the project's documentation for AI agents and tools. Each link
 ## Reference — factual surface (config, env, API)
 - [CLI reference](docs/reference/cli.md): Every maat command, flag, and exit code.
 - [Configuration reference](docs/reference/configuration.md): Every .maat.yml key, its default, and its effect.
+- [Contracts lockfile reference](docs/reference/contracts-lock.md): The format of .maat/contracts.lock.json, the committed snapshot of the contracts a repository consumes from other repositories, and how check uses it.
 - [Environment variables](docs/reference/environment.md): Environment variables Ma'at reads.
 - [Front-matter reference](docs/reference/frontmatter.md): The YAML front-matter schema every doc in docs/ carries.
 - [Contract manifest reference](docs/reference/manifest.md): The format of .maat/manifest.json, the generated index of a repository's contract edges.
@@ -50,6 +51,7 @@ This file indexes the project's documentation for AI agents and tools. Each link
 ## Contracts
 - Provides `check-action` (github-action): [Adopting Ma'at in a repository](docs/guides/deployment.md)
 - Provides `check-workflow` (github-workflow): [Adopting Ma'at in a repository](docs/guides/deployment.md)
+- Provides `contracts-lockfile-format` (schema, 1.0.0): [Contracts lockfile reference](docs/reference/contracts-lock.md)
 - Provides `maat-cli` (cli): [CLI reference](docs/reference/cli.md)
 - Provides `manifest-format` (schema, 1.0.0): [Contract manifest reference](docs/reference/manifest.md)
 
