@@ -65,10 +65,15 @@ func TestScaffoldedWorkflowPinsReleaseRefs(t *testing.T) {
 			t.Errorf("scaffolded workflow missing %q\n---\n%s", want, wf)
 		}
 	}
-	for _, bad := range []string{"@v1", "{{", "@v\"", "@v "} {
+	for _, bad := range []string{"@v1", "@v\"", "@v "} {
 		if strings.Contains(wf, bad) {
 			t.Errorf("scaffolded workflow contains forbidden %q\n---\n%s", bad, wf)
 		}
+	}
+	// No unfilled {{PLACEHOLDER}} may remain. GitHub's own `${{ ... }}`
+	// expressions are legitimate workflow syntax and are allowed.
+	if strings.Contains(strings.ReplaceAll(wf, "${{", ""), "{{") {
+		t.Errorf("scaffolded workflow contains an unfilled {{placeholder}}\n---\n%s", wf)
 	}
 }
 

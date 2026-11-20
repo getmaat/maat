@@ -64,7 +64,8 @@ edit to a generated file or a forgotten `sync`.
 | Sync command | `internal/maat/sync.go` | Compute + write derived artifacts |
 | Check command | `internal/maat/check.go` | Validate front-matter, links, code refs, drift |
 | Staleness probes | `internal/maat/staleness.go` | Decide whether a doc lags its code (git history, mtime fallback) |
-| Contracts | `internal/maat/contracts.go` | Validate `provides`/`consumes` edges, render the manifest |
+| Contracts | `internal/maat/contracts.go`, `lockfile.go` | Validate `provides`/`consumes` edges (cross-repo ones against the lockfile), render the manifest |
+| Contracts update | `internal/maat/contracts_update.go`, `fetch.go` | Fetch provider manifests into the lockfile — the only networked code |
 | Init + scaffold | `internal/maat/scaffold.go` | Stamp the scaffold into a repo (templates embedded via `//go:embed`) |
 | Config | `internal/maat/config.go` | Load `.maat.yml`, defaults, adapter registry |
 | Front-matter I/O | `internal/maat/frontmatter.go` | Split/join the `---` YAML block in Markdown |
@@ -79,6 +80,8 @@ edit to a generated file or a forgotten `sync`.
 - [Model & generators](modules/model-generate.md) — scanning docs and
   rendering derived artifacts.
 - [Check engine](modules/check.md) — the validation rules behind the CI gate.
+- [Contracts update](modules/contracts-update.md) — fetching provider
+  manifests into the lockfile; the only networked code.
 - [Init & scaffold](modules/scaffold.md) — what `maat init` stamps out, the
   embedded templates, and version-dependent values.
 - [Terminal presentation](modules/presentation.md) — TTY/color detection,

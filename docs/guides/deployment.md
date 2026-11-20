@@ -116,6 +116,34 @@ maat check --format text
 Make the job **required** so documentation drift blocks a merge, mirroring how
 a failing test does.
 
+### Contracts from other repositories (optional)
+
+If your docs consume contracts from other repositories (`consumes` refs of the
+form `owner/repo#id`), commit the lockfile written by
+`maat contracts update`, and add a **scheduled** job that fails when a provider
+has changed since — the pull-request gate itself stays offline
+([ADR 0014](../decisions/0014-cross-repo-contracts-via-lockfile.md)). With the
+reusable workflow, in a separate workflow file:
+
+```yaml
+on:
+  schedule: [{cron: "17 6 * * *"}]
+  workflow_dispatch:
+jobs:
+  contracts:
+    uses: getmaat/maat/.github/workflows/maat-check.yml@v0.2.0
+    with:
+      contracts_update_check: true
+    secrets:
+      contracts_token: ${{ secrets.CONTRACTS_TOKEN }}   # only for private providers
+```
+
+The generated `.github/workflows/maat.yml` contains the same job, commented
+out. The workflow's own token can read public repositories and the current
+one; private providers in other repositories need a token with read access to
+them (for example a fine-grained personal access token). When the job fails,
+run `maat contracts update` locally and commit the lockfile diff.
+
 ## 5. Pin the version
 
 To keep every contributor and CI on a compatible tool, declare the version your

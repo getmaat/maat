@@ -69,6 +69,9 @@ files, see [Model & generators](model-generate.md)).
   [development guide](../../guides/development.md)).
 - A placeholder that no `subs` entry fills stays in the output verbatim
   (`{{LIKE_THIS}}`). Add the key in `RunInit` when adding one to a template.
+  The workflow test rejects any leftover `{{` — except GitHub's own `${{ … }}`
+  expressions, which the workflow template uses (e.g. in the optional
+  scheduled contracts job) and `fill()` leaves alone.
 - The YAML templates (`config.yml`, `workflow.yml`) are plain text to Go; a
   placeholder that expands to YAML (like `ADAPTERS_BLOCK`) must produce valid
   YAML at the right indentation itself.

@@ -2,6 +2,8 @@
 title: Environment variables
 status: current
 summary: Environment variables Ma'at reads.
+related_code:
+  - internal/maat/fetch.go
 ---
 
 # Environment variables
@@ -27,3 +29,21 @@ variable. This preserves the original goal (CI and every agent harness get
 identical, reproducible *results* from the repository contents alone) while
 letting a human at a real terminal get styled output. See
 [ADR 0011](../decisions/0011-build-time-go-dependencies.md).
+
+## Access for `maat contracts update`
+
+One narrow exception: `maat contracts update`, the only command that uses the
+network ([ADR 0014](../decisions/0014-cross-repo-contracts-via-lockfile.md)),
+reads **credentials and the GitHub API location** from the environment.
+Credentials must never be committed to `.maat.yml`, and these variables only
+decide whether a provider's manifest can be *reached* — never what is
+validated or how. `sync` and `check` read none of them.
+
+| Variable | Effect |
+|----------|--------|
+| `GITHUB_TOKEN`, `GH_TOKEN` | Bearer token for GitHub sources (first non-empty wins). Needed for private repositories; also raises GitHub's rate limit. |
+| `MAAT_TOKEN` | Bearer token for `url` sources. GitHub tokens are never sent to `url` sources. |
+| `GITHUB_API_URL` | GitHub API root, default `https://api.github.com`. GitHub Actions sets it automatically, including on GitHub Enterprise Server. |
+| `HTTPS_PROXY` | Standard proxy setting, honored by the HTTP client. |
+
+Tokens are never printed or written to the lockfile.
