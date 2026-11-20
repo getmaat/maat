@@ -18,6 +18,7 @@ Copy [`_template.md`](_template.md) to `NNNN-short-title.md` (next number).
 
 Newest first:
 
+- [0014 Resolve cross-repo contracts through a committed lockfile](0014-cross-repo-contracts-via-lockfile.md)
 - [0013 Typed contract edges in front matter and a generated manifest](0013-contract-edges-and-manifest.md)
 - [0012 Detect staleness from git history](0012-git-aware-staleness.md)
 - [0011 Build-time Go dependencies are permitted; runtime dependencies are not](0011-build-time-go-dependencies.md)
