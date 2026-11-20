@@ -235,6 +235,8 @@ Ma'at is useful if your project:
 - wants CI to catch stale documentation;
 - is split across several repositories whose APIs depend on each other.
 
+More detail, question by question: [When to use Ma'at](docs/guides/use-cases.md).
+
 **Status:** pre-1.0. Ma'at checks its own repository on every pull request. File formats carry a schema version (manifest and lockfile are both schema 1), and breaking changes are called out in the release notes.
 
 ---
@@ -243,6 +245,7 @@ Ma'at is useful if your project:
 
 This repository uses Ma'at on itself.
 
+- When to use it: [`docs/guides/use-cases.md`](docs/guides/use-cases.md)
 - Human entry point: [`docs/index.md`](docs/index.md)
 - Agent entry point: [`docs/llms.txt`](docs/llms.txt)
 - Design decisions: [`docs/decisions/`](docs/decisions/)

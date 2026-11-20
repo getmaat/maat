@@ -51,6 +51,7 @@ humans can use the map below.
 - [Development guide](guides/development.md) — How to set up, run, and contribute to Ma'at locally.
 - [Testing guide](guides/testing.md) — How to run and write Ma'at's tests, and what CI enforces.
 - [Troubleshooting](guides/troubleshooting.md) — Common maat check failures and how to resolve them.
+- [When to use Ma'at](guides/use-cases.md) — The problems Ma'at solves, phrased as the questions people ask, with the feature that answers each one.
 
 ### Reference — factual surface (config, env, API)
 
