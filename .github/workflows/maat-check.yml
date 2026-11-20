@@ -16,6 +16,19 @@
 #       uses: getmaat/maat/.github/workflows/maat-check.yml@v1
 #       with:
 #         maat_version: "0.1.0"   # optional; pin for reproducibility
+#
+# Scheduled contracts freshness check (ADR 0014), in a separate caller:
+#
+#   on:
+#     schedule: [{cron: "17 6 * * *"}]
+#     workflow_dispatch:
+#   jobs:
+#     contracts:
+#       uses: getmaat/maat/.github/workflows/maat-check.yml@v1
+#       with:
+#         contracts_update_check: true
+#       secrets:
+#         contracts_token: ${{ secrets.CONTRACTS_TOKEN }}   # optional, for private providers
 name: maat-check
 
 on:
@@ -36,9 +49,19 @@ on:
         type: boolean
         required: false
         default: false
+      contracts_update_check:
+        description: "Instead of the docs check, run `maat contracts update --check` (for a scheduled job; ADR 0014)."
+        type: boolean
+        required: false
+        default: false
+    secrets:
+      contracts_token:
+        description: "Token with read access to private provider repositories. Defaults to the workflow's own token."
+        required: false
 
 jobs:
   check:
+    if: ${{ !inputs.contracts_update_check }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -53,3 +76,21 @@ jobs:
           version: ${{ inputs.maat_version }}
           path: ${{ inputs.path }}
           args: ${{ inputs.strict && '--strict' || '' }}
+
+  contracts:
+    if: ${{ inputs.contracts_update_check }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Ma'at
+        env:
+          MAAT_VERSION: ${{ inputs.maat_version }}
+          MAAT_INSTALL_DIR: /usr/local/bin
+        run: curl -sSf https://raw.githubusercontent.com/getmaat/maat/main/scripts/install.sh | sh
+
+      - name: Check the contracts lockfile is current
+        env:
+          GITHUB_TOKEN: ${{ secrets.contracts_token || github.token }}
+        run: maat contracts update --check "${{ inputs.path }}"

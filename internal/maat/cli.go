@@ -35,6 +35,9 @@ commands:
   init    scaffold Ma'at into a repository
   sync    regenerate llms.txt, adapters, index
   check   validate docs (CI gate)
+  contracts update [--check]
+          fetch consumed repos' manifests into .maat/contracts.lock.json
+          (the only networked command)
 
 Run 'maat <command> --help' for command-specific options.`
 
@@ -69,6 +72,8 @@ func Main(argv []string, stdout, stderr io.Writer) int {
 		code, err = cmdSync(rest, stdout, stderr)
 	case "check":
 		code, err = cmdCheck(rest, stdout, stderr)
+	case "contracts":
+		code, err = cmdContracts(rest, stdout, stderr)
 	default:
 		fmt.Fprintf(stderr, "maat: error: unknown command %s\n", pyRepr(command))
 		fmt.Fprintln(stderr, usageText)
@@ -96,6 +101,7 @@ type parsed struct {
 	strict    bool
 	agents    []string
 	agentsSet bool // distinguishes "--agents=" (explicitly zero agents) from "not given"
+	checkLock bool // contracts update --check: report, do not write
 }
 
 // parseArgs parses a subcommand's arguments. allowed lists the value-taking
@@ -110,6 +116,8 @@ func parseArgs(command string, args []string) (*parsed, error) {
 			p.force = true
 		case arg == "--strict" && command == "check":
 			p.strict = true
+		case arg == "--check" && command == "contracts update":
+			p.checkLock = true
 		case arg == "--name" && command == "init":
 			val, next, err := flagValue(args, i)
 			if err != nil {

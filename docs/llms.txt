@@ -6,6 +6,7 @@ This file indexes the project's documentation for AI agents and tools. Each link
 
 ## Architecture — how the system is built
 - [Check engine module](docs/architecture/modules/check.md): The validation rules behind `maat check` — the CI gate.
+- [Contracts update module](docs/architecture/modules/contracts-update.md): How maat contracts update fetches provider manifests and writes the lockfile — the only networked code in Ma'at.
 - [Model & generators module](docs/architecture/modules/model-generate.md): Scanning the docs tree into a model and rendering derived artifacts from it.
 - [Terminal presentation module](docs/architecture/modules/presentation.md): TTY/color detection, Lip Gloss styling, and the Huh init wizard layered on top of the plain-text output every command already produces.
 - [Init & scaffold module](docs/architecture/modules/scaffold.md): What maat init stamps into a repository, where the embedded templates live, and how version-dependent values get into them.

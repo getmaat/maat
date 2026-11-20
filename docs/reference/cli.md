@@ -103,6 +103,37 @@ This is the command CI runs.
 See the [check engine](../architecture/modules/check.md) for the full rule
 list.
 
+## `contracts update`
+
+Fetch the manifests of the repositories this one consumes contracts from
+(`consumes: [{ref: owner/repo#id}]`) and write `.maat/contracts.lock.json`.
+`check` validates cross-repo refs against that lockfile offline; this is the
+**only** command that uses the network
+([ADR 0014](../decisions/0014-cross-repo-contracts-via-lockfile.md)).
+
+```bash
+maat contracts update            # write or refresh the lockfile
+maat contracts update --check    # report only; exit 1 if out of date
+```
+
+| Flag | Effect |
+|------|--------|
+| `--check` | Do not write; print what changed and exit `1` if the lockfile is out of date (for a scheduled CI job) |
+
+Each consumed repository needs a `contracts.sources` entry (see the
+[contracts lockfile reference](contracts-lock.md)). If any source cannot be
+read, nothing is written and the command exits `1`, listing every failure.
+When nothing cross-repo is consumed, an existing lockfile is removed.
+
+A provider commit alone does not change the lockfile: an entry is rewritten
+only when a consumed contract appears, disappears or changes version, or the
+source settings change.
+
+Environment: `GITHUB_TOKEN` or `GH_TOKEN` for GitHub sources (needed for
+private repositories and to avoid rate limits), `MAAT_TOKEN` for `url`
+sources, `GITHUB_API_URL` for GitHub Enterprise Server. See
+[environment variables](environment.md).
+
 ## Colored output
 
 `init`, `sync`, and `check --format text` style their output when stdout is a
@@ -118,6 +149,6 @@ either variable. See
 | Code | Meaning |
 |------|---------|
 | `0` | Success — no error-severity findings |
-| `1` | Validation failed — at least one error-severity finding |
+| `1` | Validation failed — at least one error-severity finding; for `contracts update`, a source could not be read, or (`--check`) the lockfile is out of date |
 | `2` | Usage/configuration error (e.g. no `docs/` directory, bad arguments, or a released binary that does not satisfy the repo's [`maat_version`](configuration.md#maat_version) constraint) |
 | `130` | `init`'s interactive wizard was aborted (Ctrl-C/Esc) before completing |

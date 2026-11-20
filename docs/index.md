@@ -20,6 +20,7 @@ humans can use the map below.
 ### Architecture — how the system is built
 
 - [Check engine module](architecture/modules/check.md) — The validation rules behind `maat check` — the CI gate.
+- [Contracts update module](architecture/modules/contracts-update.md) — How maat contracts update fetches provider manifests and writes the lockfile — the only networked code in Ma'at.
 - [Model & generators module](architecture/modules/model-generate.md) — Scanning the docs tree into a model and rendering derived artifacts from it.
 - [Terminal presentation module](architecture/modules/presentation.md) — TTY/color detection, Lip Gloss styling, and the Huh init wizard layered on top of the plain-text output every command already produces.
 - [Init & scaffold module](architecture/modules/scaffold.md) — What maat init stamps into a repository, where the embedded templates live, and how version-dependent values get into them.

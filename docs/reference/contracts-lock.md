@@ -74,7 +74,7 @@ only from the environment (`GITHUB_TOKEN` / `GH_TOKEN`, or `MAAT_TOKEN` for
 | `schema` | Lockfile format version, currently `1`. |
 | `sources` | One entry per consumed repository, keyed `owner/name`. |
 | `ref` / `url` / `path` | The source settings the snapshot was taken with (omitted when unset). |
-| `commit` | The provider commit the manifest was read at, when the host reports one. |
+| `commit` | The provider commit at which this state of the consumed contracts was first observed (GitHub sources only). It is not updated for provider commits that change nothing consumed. |
 | `manifest_schema` | The provider manifest's `schema`. |
 | `provides` | The **consumed** contracts the provider has, as declared in its manifest. |
 | `missing` | Consumed ids the provider does not provide. |
