@@ -4,6 +4,7 @@ status: current
 summary: What maat init stamps into a repository, where the embedded templates live, and how version-dependent values get into them.
 related_code:
   - internal/maat/scaffold.go
+  - internal/maat/badge.go
   - internal/maat/templates
 ---
 
@@ -37,6 +38,11 @@ files, see [Model & generators](model-generate.md)).
     of them with `--force`), then runs `RunSync`.
   - `repoFromRemote()` / `repoFromURL()` — pre-fill `repo:` once from the git
     `origin` remote ([ADR 0013](../../decisions/0013-contract-edges-and-manifest.md)).
+- `internal/maat/badge.go` — the optional README docs badge.
+  `readmeBadgeState()` tells `init` whether to offer it (a `README.md` exists
+  without it); `addReadmeBadge()` inserts it below the title heading after
+  the user says yes in the wizard. The badge is a static shields.io image
+  linking to Ma'at, so it needs no repo identity, CI provider or network.
 - `internal/maat/templates/` — the template files themselves. The scaffold
   templates are deliberately thinner than this repository's own docs, which
   are hand-written so the project dogfoods the framework.
@@ -55,6 +61,9 @@ files, see [Model & generators](model-generate.md)).
 - **Derived values are computed only when the file is actually written.** For
   example, `repo` is read from the remote only when `.maat.yml` is new (or
   `--force` is given), so `init` never claims to have set something it skipped.
+- **`README.md` is not a scaffold file.** `init` never creates it and edits
+  it only to add the docs badge, and only after an explicit yes in the
+  interactive wizard. Otherwise it prints the snippet to paste.
 - `init` exit code is 0 on success, including when files were skipped.
 
 ## Gotchas

@@ -27,7 +27,7 @@ func TestCmdInitLaunchesWizardWhenInteractiveAndNoFlags(t *testing.T) {
 
 	isInteractiveTerminal = func(io.Writer) bool { return true }
 	called := false
-	runInitWizard = func(defaultName string, defaultAgents []string) (wizardResult, error) {
+	runInitWizard = func(defaultName string, defaultAgents []string, offerBadge bool) (wizardResult, error) {
 		called = true
 		return wizardResult{name: "Wizarded", summary: "from the wizard", agents: defaultAgents, ok: true}, nil
 	}
@@ -50,7 +50,7 @@ func TestCmdInitSkipsWizardWhenFlagsGiven(t *testing.T) {
 	defer func() { isInteractiveTerminal, runInitWizard = oldTTY, oldWizard }()
 
 	isInteractiveTerminal = func(io.Writer) bool { return true } // even though "interactive"...
-	runInitWizard = func(defaultName string, defaultAgents []string) (wizardResult, error) {
+	runInitWizard = func(defaultName string, defaultAgents []string, offerBadge bool) (wizardResult, error) {
 		t.Fatal("wizard must not be invoked when --name/--summary are given")
 		return wizardResult{}, nil
 	}
@@ -67,7 +67,7 @@ func TestCmdInitReturns130OnWizardAbort(t *testing.T) {
 	defer func() { isInteractiveTerminal, runInitWizard = oldTTY, oldWizard }()
 
 	isInteractiveTerminal = func(io.Writer) bool { return true }
-	runInitWizard = func(defaultName string, defaultAgents []string) (wizardResult, error) {
+	runInitWizard = func(defaultName string, defaultAgents []string, offerBadge bool) (wizardResult, error) {
 		return wizardResult{ok: false}, nil
 	}
 
@@ -157,7 +157,7 @@ func TestCmdInitWizardAgentSelectionReachesConfig(t *testing.T) {
 	defer func() { isInteractiveTerminal, runInitWizard = oldTTY, oldWizard }()
 
 	isInteractiveTerminal = func(io.Writer) bool { return true }
-	runInitWizard = func(defaultName string, defaultAgents []string) (wizardResult, error) {
+	runInitWizard = func(defaultName string, defaultAgents []string, offerBadge bool) (wizardResult, error) {
 		return wizardResult{name: defaultName, agents: []string{"hermes"}, ok: true}, nil
 	}
 

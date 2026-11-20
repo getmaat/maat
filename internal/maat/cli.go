@@ -217,13 +217,15 @@ func cmdInit(args []string, stdout, _ io.Writer) (int, error) {
 	root := absRoot(p.path)
 	name, summary := p.name, p.summary
 	agents, agentsChosen := p.agents, p.agentsSet
+	wantBadge := false
 	if name == "" && summary == "" && !agentsChosen && isInteractiveTerminal(stdout) {
 		// Seed the wizard's agent multi-select from whatever's already
 		// configured (LoadConfig defaults to adapterOrder when .maat.yml is
 		// absent), so a re-init shows the repo's actual current state rather
 		// than always resetting to "everything checked."
 		seedCfg, _ := LoadConfig(root)
-		w, err := runInitWizard(filepath.Base(root), toStringList(seedCfg["adapters"]))
+		readmeExists, readmeHasBadge := readmeBadgeState(root)
+		w, err := runInitWizard(filepath.Base(root), toStringList(seedCfg["adapters"]), readmeExists && !readmeHasBadge)
 		if err != nil {
 			return 0, err
 		}
@@ -233,6 +235,7 @@ func cmdInit(args []string, stdout, _ io.Writer) (int, error) {
 		}
 		name, summary, agents = w.name, w.summary, w.agents
 		agentsChosen = true
+		wantBadge = w.badge
 	}
 	if name == "" {
 		name = filepath.Base(root)
@@ -243,6 +246,12 @@ func cmdInit(args []string, stdout, _ io.Writer) (int, error) {
 	result, err := RunInit(root, name, summary, agents, p.force)
 	if err != nil {
 		return 0, err
+	}
+	badgeAdded := false
+	if wantBadge {
+		if badgeAdded, err = addReadmeBadge(root); err != nil {
+			return 0, err
+		}
 	}
 	color := isColorEnabled(stdout)
 	for _, rel := range result.Created {
@@ -264,6 +273,13 @@ func cmdInit(args []string, stdout, _ io.Writer) (int, error) {
 			fmt.Fprintln(stdout, styledGenLine(rel))
 		} else {
 			fmt.Fprintf(stdout, "  gen     %s\n", rel)
+		}
+	}
+	if badgeAdded {
+		if color {
+			fmt.Fprintln(stdout, styledUpdateLine(readmeFilename))
+		} else {
+			fmt.Fprintf(stdout, "  update  %s\n", readmeFilename)
 		}
 	}
 	fmt.Fprintf(stdout, "\nMa'at initialized in %s\n", root)
@@ -311,6 +327,11 @@ func cmdInit(args []string, stdout, _ io.Writer) (int, error) {
 			"  3. Re-run `maat check` until green, then commit.\n", len(result.Skipped), skillsRoot)
 	} else {
 		fmt.Fprint(stdout, "Next: edit AGENTS.md's project overview, then run `maat check`.\n")
+	}
+	if badgeAdded {
+		fmt.Fprint(stdout, "\nAdded a docs badge below the title in README.md. Remove the line if you'd rather not show it.\n")
+	} else if _, has := readmeBadgeState(root); !has {
+		fmt.Fprintf(stdout, "\nOptional: show readers that this repository's docs are checked. Add this to your README:\n\n  %s\n", readmeBadge)
 	}
 	return 0, nil
 }
