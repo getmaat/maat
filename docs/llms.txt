@@ -35,6 +35,7 @@ This file indexes the project's documentation for AI agents and tools. Each link
 - [Development guide](docs/guides/development.md): How to set up, run, and contribute to Ma'at locally.
 - [Testing guide](docs/guides/testing.md): How to run and write Ma'at's tests, and what CI enforces.
 - [Troubleshooting](docs/guides/troubleshooting.md): Common maat check failures and how to resolve them.
+- [When to use Ma'at](docs/guides/use-cases.md): The problems Ma'at solves, phrased as the questions people ask, with the feature that answers each one.
 
 ## Reference — factual surface (config, env, API)
 - [CLI reference](docs/reference/cli.md): Every maat command, flag, and exit code.
