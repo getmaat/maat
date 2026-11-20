@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  Keep your docs, source code, and AI-agent instructions in sync. Fail CI when they drift.
+  Keep your docs, source code, and AI-agent instructions in sync — within a repository and across repositories. Fail CI when they drift.
 </p>
 
 <p align="center">
@@ -95,13 +95,15 @@ That gives your repo a documentation-as-code structure, generated AI-agent adapt
 
 ## What Ma'at gives you
 
-| Problem                                                    | Ma'at’s answer                                                                                     |
-| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Docs rot after code changes                                | Docs declare the source files they cover via `related_code`; `maat check` detects stale docs.      |
-| Every AI agent wants a different instruction file          | Keep `AGENTS.md` canonical; generate agent-specific adapters.                                      |
+| Problem | Ma'at's answer |
+| --- | --- |
+| Docs rot after code changes | Docs declare the source files they cover via `related_code`; `maat check` uses git history to flag a doc whose code changed after it. |
+| Every AI agent wants a different instruction file | Keep `AGENTS.md` canonical; generate agent-specific adapters. |
 | New contributors do not know where durable knowledge lives | Scaffold a predictable `docs/` tree with guides, architecture docs, ADRs, references, and indexes. |
-| Generated files drift from source                          | `maat sync` regenerates them; `maat check` verifies them.                                          |
-| Teams forget to update docs                                | CI fails the pull request, just like a test failure.                                               |
+| Generated files drift from source | `maat sync` regenerates them; `maat check` verifies them. |
+| Teams forget to update docs | CI fails the pull request, just like a test failure. |
+| An agent in one repo knows nothing about the APIs of the others | Docs declare the contracts they `provide` and `consume`; every repo publishes a machine-readable manifest. |
+| A provider changes an API and consumers find out in production | Consumers lock the contracts they use; `maat check` fails on an incompatible version, and a scheduled job reports provider changes. |
 
 ---
 
@@ -138,6 +140,7 @@ docs/
   reference/
   meta/
 .maat/
+  manifest.json                  # generated: the contracts this repo provides and consumes
   skills/                        # generated agent skills (e.g. retrospect)
   templates/                     # module doc template (ADR template lives at docs/decisions/_template.md)
 .maat.yml                        # Ma'at configuration
@@ -163,26 +166,74 @@ If your repository already has an `AGENTS.md`, Ma'at preserves your prose and in
                          .maat.yml
                               │
                               ▼
-   docs/*.md  ──scan──▶  DocsModel  ──┬── generate ──▶ llms.txt, adapters, index
+   docs/*.md  ──scan──▶  DocsModel  ──┬── generate ──▶ llms.txt, adapters, index, manifest
   AGENTS.md                           │
                                       └── validate ──▶ pass/fail, the CI gate
+                                              ▲
+                     .maat/contracts.lock.json  (other repos' contracts, fetched on demand)
 ```
 
 - **`docs/` + `AGENTS.md`** are the source of truth — hand-written, reviewed in PRs, and versioned with the code.
-- **`docs/llms.txt`**, the per-agent adapter files, and the navigation in `docs/index.md` are generated from that source.
-- **`maat check`** verifies front matter, links, `related_code`, staleness, and generated-file drift.
+- **`docs/llms.txt`**, the per-agent adapter files, the navigation in `docs/index.md`, and the contract manifest are generated from that source.
+- **`maat check`** verifies front matter, links, `related_code`, staleness, contracts, and generated-file drift — fully offline and deterministic.
 - **CI fails** when docs or generated files fall behind the code.
+
+---
+
+## Contracts across repositories
+
+Real systems span repositories: a service documents an API that three others call. Ma'at lets docs declare those edges, so they are reviewed like any other change and checked in CI.
+
+A doc that describes an interface declares what it **provides**; a doc whose subject depends on one declares what it **consumes**:
+
+```yaml
+---
+title: Invoice API
+status: current
+related_code:
+  - internal/billing/api.go
+provides:
+  - id: invoice-api
+    kind: http-api
+    version: 2.1.0
+    spec: api/openapi.yaml       # a spec change marks this doc stale
+consumes:
+  - ref: acme/ledger#ledger-events
+    version: "~> 1.4"
+---
+```
+
+- `maat sync` collects every edge into **`.maat/manifest.json`**, a fixed path any tool or repository can read, and lists them in `llms.txt` so agents see the interfaces up front.
+- Refs within the repository are checked directly: they must resolve, and versions must satisfy the constraint.
+- For refs to **other repositories**, list where their manifests live and lock them:
+
+  ```yaml
+  # .maat.yml
+  repo: acme/billing
+  contracts:
+    sources:
+      acme/ledger:                # GitHub by default; URL templates and local paths also work
+  ```
+
+  ```bash
+  maat contracts update           # fetch the consumed contracts into .maat/contracts.lock.json
+  ```
+
+  `maat check` validates cross-repo refs against that committed lockfile, offline. A scheduled CI job running `maat contracts update --check` fails when a provider has changed since — so a breaking change arrives as a reviewable lockfile diff, not as a red build on someone's unrelated pull request.
+
+Details: [contract fields](docs/reference/frontmatter.md#provides-and-consumes), [manifest format](docs/reference/manifest.md), [lockfile and sources](docs/reference/contracts-lock.md), and the design in [ADR 0013](docs/decisions/0013-contract-edges-and-manifest.md) and [ADR 0014](docs/decisions/0014-cross-repo-contracts-via-lockfile.md).
 
 ---
 
 ## CLI
 
-A single static binary with zero runtime dependencies.
+A single static binary with zero runtime dependencies. It uses `git` for staleness when available, and touches the network only in `maat contracts update`.
 
 ```bash
-maat init .     # scaffold docs/, AGENTS.md, config, CI, .maat/templates, and adapters
-maat sync       # regenerate llms.txt, adapters, and index navigation
-maat check      # validate docs and fail on drift
+maat init .                # scaffold docs/, AGENTS.md, config, CI, .maat/templates, and adapters
+maat sync                  # regenerate llms.txt, adapters, index navigation, and the manifest
+maat check                 # validate docs and fail on drift
+maat contracts update      # lock the contracts consumed from other repositories
 ```
 
 Running from a clone without installing:
@@ -192,11 +243,14 @@ go build -o maat .
 go run . <command>
 ```
 
-| Command | Does                                                                 |
-| ------- | -------------------------------------------------------------------- |
-| `init`  | Stamps the framework into a repository. Safe to re-run.              |
-| `sync`  | Regenerates every derived file from the docs tree and `AGENTS.md`.   |
-| `check` | Validates front matter, links, `related_code`, staleness, and drift. |
+| Command | Does |
+| --- | --- |
+| `init` | Stamps the framework into a repository. Safe to re-run; never overwrites existing files. |
+| `sync` | Regenerates every derived file from the docs tree and `AGENTS.md`. |
+| `check` | Validates front matter, links, `related_code`, staleness, contracts, and drift. Offline. |
+| `contracts update` | Fetches the manifests of consumed repositories into the lockfile; `--check` only reports. |
+
+Full reference: [`docs/reference/cli.md`](docs/reference/cli.md).
 
 ---
 
@@ -219,12 +273,26 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0   # full history, so staleness can compare commits
-      - uses: getmaat/maat@v0.7.0
+      - uses: getmaat/maat@v0.9.0
         with:
-          version: "0.7.0"
+          version: "0.9.0"
 ```
 
 Make this job required if you want documentation drift to block merges.
+
+If your docs consume contracts from other repositories, add a scheduled job that checks the lockfile is still current. The reusable workflow has it built in:
+
+```yaml
+on:
+  schedule: [{cron: "17 6 * * *"}]
+jobs:
+  contracts:
+    uses: getmaat/maat/.github/workflows/maat-check.yml@v0.9.0
+    with:
+      contracts_update_check: true
+```
+
+See the [deployment guide](docs/guides/deployment.md) for tokens, private repositories, and non-GitHub CI.
 
 ---
 
@@ -236,6 +304,7 @@ Ma'at is useful if your project:
 - has docs that should stay versioned with the code;
 - wants one canonical source for contributor and agent instructions;
 - wants CI to catch stale documentation;
+- is split across several repositories whose APIs depend on each other;
 - wants a lightweight convention instead of a hosted docs platform.
 
 Ma'at is **not** a documentation website generator.
