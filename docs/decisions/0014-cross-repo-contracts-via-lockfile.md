@@ -1,12 +1,12 @@
 ---
 title: 0014 Resolve cross-repo contracts through a committed lockfile
-status: draft
+status: current
 summary: An explicit, opt-in command fetches the manifests of the repositories a repo consumes into a committed lockfile; check validates cross-repo refs against that lockfile offline, so sync and check stay deterministic.
 ---
 
 # 0014. Resolve cross-repo contracts through a committed lockfile
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-11-18
 - **Relates to:** [0013 Typed contract edges and a generated manifest](0013-contract-edges-and-manifest.md), [0011 Build-time Go dependencies are permitted; runtime dependencies are not](0011-build-time-go-dependencies.md), [0007 Agent skills as managed artifacts](0007-agent-skills-as-managed-artifacts.md)
 
@@ -124,9 +124,16 @@ generated files, except that regenerating it needs the network.
 An offline `check` cannot know that a provider released a breaking change
 after the lockfile was written. That is the trade-off of this design, and it
 is made explicitly: freshness comes from a **scheduled CI job** running
-`maat contracts update --check` (daily, say), which fails — or opens a PR with
-the updated lockfile — when a provider changed. The scaffolded workflow and
-the reusable workflow gain an optional job for this.
+`maat contracts update --check` (daily, say), which **fails** when a provider
+changed; a human then runs `maat contracts update` and commits the lockfile
+diff. The scaffolded workflow and the reusable workflow gain an optional job
+for this. Opening the update pull request automatically is deliberately left
+out for now (see *Resolved during review*).
+
+The signal is the provider's **declared version** (and the presence of the
+consumed `id`), not the content of its spec or doc. Ma'at relies on providers
+bumping versions when a contract changes; a provider that changes a contract
+without bumping it is not detected.
 
 The pull-request gate stays deterministic: the same commit always passes or
 fails the same way, and a provider's change shows up as a reviewable lockfile
@@ -181,13 +188,23 @@ them without a commit.
   host-agnostic everywhere else; a URL template costs little and keeps GitLab
   and self-hosted users in.
 
-## Open questions for review
+## Resolved during review
 
-1. Should the scheduled freshness job **open a pull request** with the updated
-   lockfile, or only fail and leave the update to a human? Opening PRs needs a
-   write token and more workflow code.
-2. Should a provider's change to a **consumed contract's doc or spec** (not
-   just its version) also show up — for example by recording a content hash
-   in the lockfile — or is the version the right level of signal?
-3. Is the **reverse view** ("who consumes my contracts?") needed for v0.9, or
-   can it wait for an org index (see alternatives)?
+1. **The scheduled job fails; it does not open pull requests.** A workflow
+   could open the update PR with the built-in `GITHUB_TOKEN`, but GitHub does
+   not run workflows on pull requests created with that token, so the PR would
+   arrive with no checks run on it; doing it properly needs a GitHub App or a
+   personal token. A failing job plus a manual `maat contracts update` is
+   reliable and simple. An opt-in auto-PR mode can be added later without
+   changing the lockfile format.
+2. **Only versions are tracked, not spec or doc content.** A content hash
+   would make `--check` fail on every typo fix, reformat or comment in a
+   provider's spec, training teams to ignore it. The version is the
+   provider's deliberate statement that a contract changed and by how much.
+   Content hashing may return later as an opt-in, recorded alongside the
+   version.
+3. **The reverse view ("who consumes my contracts?") is deferred.** A
+   repository can only see what it consumes; who consumes *it* is visible
+   only where consumer lockfiles are collected, which is the org index listed
+   under *Alternatives considered*. Consumer-side checks deliver most of the
+   value without that shared infrastructure.
