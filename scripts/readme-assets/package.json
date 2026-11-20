@@ -1,0 +1,11 @@
+{
+  "name": "maat-readme-assets",
+  "private": true,
+  "description": "Maintainer tooling that renders the README banner, social preview and demo GIF. Not part of Ma'at.",
+  "type": "module",
+  "devDependencies": {
+    "@fontsource-variable/inter": "5.1.1",
+    "@fontsource/jetbrains-mono": "5.1.1",
+    "playwright": "1.63.0"
+  }
+}

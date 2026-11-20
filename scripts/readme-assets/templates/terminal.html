@@ -1,0 +1,92 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face { font-family: "JB"; src: url("jetbrains-mono-latin-400-normal.woff2"); font-weight: 400; }
+@font-face { font-family: "JB"; src: url("jetbrains-mono-latin-700-normal.woff2"); font-weight: 700; }
+@font-face { font-family: "InterV"; src: url("inter-latin-opsz-normal.woff2"); font-weight: 100 900; }
+:root { --bg:#00060b; --win:#06111a; --bar:#0b1a24; --teal:#03cdb4; --teal-hi:#5fe4c2; --gold:#f2b33d;
+        --pink:#ff6aa9; --ink:#e3f1ef; --muted:#7f9997; --line:rgba(3,205,180,.22); }
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { width:1200px; height:720px; overflow:hidden;
+  background: radial-gradient(800px 500px at 15% 10%, rgba(3,205,180,.14), transparent 60%),
+              radial-gradient(700px 500px at 100% 100%, rgba(224,85,154,.12), transparent 60%), var(--bg); }
+.win { position:absolute; left:28px; top:24px; right:28px; bottom:24px; border-radius:14px; overflow:hidden;
+  background:var(--win); border:1px solid var(--line); box-shadow: 0 24px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.4); }
+.bar { height:40px; background:var(--bar); display:flex; align-items:center; padding:0 16px; gap:8px; border-bottom:1px solid rgba(255,255,255,.04); }
+.dot { width:12px; height:12px; border-radius:50%; }
+.title { flex:1; text-align:center; font: 600 13px "InterV", sans-serif; color:var(--muted); margin-right:52px; letter-spacing:.02em; }
+.body { padding:20px 24px; font-family:"JB", monospace; font-size:17.5px; line-height:27px; font-variant-ligatures:none; font-feature-settings:"liga" 0, "calt" 0; color:var(--ink); white-space:pre-wrap; word-break:break-word; }
+.l { min-height:27px; }
+.teal{color:var(--teal-hi)} .gold{color:var(--gold)} .ink{color:var(--ink)} .muted{color:var(--muted)}
+.ok{color:#5fe49a} .warn{color:var(--gold)} .err{color:var(--pink)} .b{font-weight:700}
+.cm { color:var(--muted); font-style:italic; }
+.pr-dir { color:var(--teal-hi); font-weight:700; } .pr-sig { color:var(--gold); font-weight:700; }
+.cur { display:inline-block; width:10px; height:21px; background:var(--teal-hi); vertical-align:-3px; margin-left:1px; }
+.end { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px;
+  background: radial-gradient(600px 380px at 50% 45%, rgba(3,205,180,.18), transparent 70%), #00060b; opacity:0; }
+.end img { width:430px; filter: drop-shadow(0 0 22px rgba(3,205,180,.35)); }
+.end h1 { font: 800 50px "InterV",sans-serif; letter-spacing:-.03em; color:var(--ink); }
+.end h1 span { background:linear-gradient(90deg,#5fe4c2,#03cdb4 45%,#f2b33d); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.end code { font-variant-ligatures:none; font: 700 19px "JB",monospace; color:var(--ink); background:rgba(3,205,180,.08); border:1px solid var(--line); padding:10px 18px; border-radius:10px; }
+.end code b { color:var(--gold); }
+.end .u { font: 400 16px "JB",monospace; color:var(--muted); } .end .u b { color:var(--teal-hi); }
+</style></head><body>
+<div class="win">
+  <div class="bar"><span class="dot" style="background:#e0559a"></span><span class="dot" style="background:#f2b33d"></span><span class="dot" style="background:#03cdb4"></span>
+    <div class="title">~/acme/billing</div></div>
+  <div class="body" id="body"></div>
+</div>
+<div class="end" id="end">
+  <img src="maat-logo-alpha.png" alt="">
+  <h1>Docs your agents <span>can trust.</span></h1>
+  <code><b>$</b> brew install getmaat/tap/maat</code>
+  <div class="u">github.com/<b>getmaat/maat</b></div>
+</div>
+<script>
+const MAX_LINES = 22, CPS = 30;
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const span = ([c,t]) => c ? `<span class="${c}">${esc(t)}</span>` : esc(t);
+// deterministic per-character jitter so typing looks human but renders identically every time
+const jitter = i => 0.55 + ((Math.sin(i * 12.9898) * 43758.5453) % 1 + 1) % 1 * 0.9;
+
+let EV = [], DURATION = 0;
+function build(story) {
+  let T = 0.35, first = true;
+  for (const s of story) {
+    if (s.k === 'cmd' || s.k === 'comment') {
+      const gap = !first;
+      const shown = T, start = T + (s.k === 'cmd' ? 0.5 : 0.25);
+      const times = []; let x = start;
+      for (let i = 0; i < s.text.length; i++) { x += jitter(i) / (s.k === 'cmd' ? CPS : CPS * 1.6); times.push(x); }
+      EV.push({ k: s.k, text: s.text, shown, start, times, gap });
+      T = x + (s.k === 'cmd' ? 0.35 : 0.3); first = false;
+    } else if (s.k === 'out') {
+      for (const l of s.lines) { EV.push({ k: 'line', segs: l, at: T }); T += s.per; }
+      T += 0.25;
+    } else if (s.k === 'pause') { T += s.s; }
+    else if (s.k === 'clear') { EV.push({ k: 'clear', at: T }); first = true; T += 0.15; }
+    else if (s.k === 'end') { EV.push({ k: 'end', at: T }); T += 4.2; }
+  }
+  DURATION = T;
+}
+function render(t) {
+  let lines = [], endAt = null, live = null;
+  for (const e of EV) {
+    if (e.k === 'clear') { if (e.at <= t) lines = []; continue; }
+    if (e.k === 'end') { endAt = e.at; continue; }
+    if (e.k === 'line') { if (e.at <= t) lines.push(e.segs.map(span).join('')); continue; }
+    if (e.shown > t) continue;
+    const n = e.times.filter(x => x <= t).length;
+    const done = n === e.text.length && t >= e.times[e.times.length - 1] + 0.12;
+    const typed = esc(e.text.slice(0, n));
+    if (e.gap) lines.push('');
+    const cursor = done ? '' : ((t < e.start && Math.floor(t * 2.2) % 2) ? '<span class="cur" style="opacity:0"></span>' : '<span class="cur"></span>');
+    lines.push(e.k === 'cmd'
+      ? `<span class="pr-dir">billing</span> <span class="pr-sig">$</span> ${typed}${cursor}`
+      : `<span class="cm">${typed}</span>${cursor}`);
+  }
+  document.getElementById('body').innerHTML = lines.slice(-MAX_LINES).map(l => `<div class="l">${l}</div>`).join('');
+  const op = endAt === null ? 0 : Math.max(0, Math.min(1, (t - endAt) / 0.6));
+  document.getElementById('end').style.opacity = op;
+}
+window.__setup = story => { build(story); return DURATION; };
+window.__render = render;
+</script></body></html>

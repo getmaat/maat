@@ -32,3 +32,6 @@ htmlcov/
 *.swp
 .idea/
 .vscode/
+
+# README asset tooling (scripts/readme-assets)
+scripts/readme-assets/node_modules/

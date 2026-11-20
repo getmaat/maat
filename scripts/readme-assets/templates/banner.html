@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="style.css">
+<style>
+  .card { width: 1280px; height: 400px; display: flex; align-items: center; padding: 0 56px 0 28px; gap: 26px; }
+  .logo { width: 420px; flex: none; }
+  .halo { left: 40px; top: 40px; width: 360px; height: 320px; }
+  .right { display: flex; flex-direction: column; gap: 18px; }
+  h1 { font-size: 62px; }
+  .sub { font-size: 20px; max-width: 720px; }
+  .chip { font-size: 14px; padding: 6px 12px; }
+  .chips { flex-wrap: nowrap; }
+  .divider { position: relative; width: 1.5px; height: 230px; flex: none;
+    background: linear-gradient(180deg, transparent, rgba(3,205,180,.6), transparent); }
+</style></head><body>
+<div class="card">
+  <div class="halo"></div>
+  <img class="logo" src="maat-logo-alpha.png" alt="">
+  <div class="divider"></div>
+  <div class="right">
+    <h1>Docs your agents<br><span class="grad">can trust.</span></h1>
+    <p class="sub">Docs, code and agent instructions stay in sync. <b>API contracts are checked across repos.</b> CI fails the moment they drift.</p>
+    <div class="chips">
+      <span class="chip t"><i></i>AGENTS.md → 6 agents</span>
+      <span class="chip g"><i></i>git-aware staleness</span>
+      <span class="chip p"><i></i>cross-repo contracts</span>
+    </div>
+  </div>
+</div></body></html>
