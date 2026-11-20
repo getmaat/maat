@@ -43,10 +43,6 @@ type Dependency struct {
 	Doc     string `json:"doc"`
 }
 
-// local reports whether the dependency points at a contract in this repo
-// (a bare id, without an "owner/repo#" prefix).
-func (d Dependency) local() bool { return !strings.Contains(d.Ref, "#") }
-
 // contractSet is every valid edge in the docs tree, plus the problems found
 // while collecting them. Invalid entries are reported and left out, so one
 // typo does not hide the rest of the manifest.
@@ -264,34 +260,28 @@ func checkContracts(model *DocsModel, cfg map[string]any) []Finding {
 	for _, c := range cs.Provides {
 		provided[c.ID] = c
 	}
+	self := configRepo(cfg)
+	var crossRepo []Dependency
 	for _, d := range cs.Consumes {
-		if !d.local() {
-			continue
+		id := d.Ref
+		if repo, refID, cross := splitRef(d.Ref); cross {
+			if self == "" || repo != self {
+				crossRepo = append(crossRepo, d)
+				continue
+			}
+			id = refID // a full ref to this repository resolves locally
 		}
-		c, ok := provided[d.Ref]
+		c, ok := provided[id]
 		if !ok {
 			findings = append(findings, Finding{sev, "contract_unresolved", d.Doc,
 				fmt.Sprintf("consumes %s, but no doc in this repository provides it", pyRepr(d.Ref))})
 			continue
 		}
-		if d.Version == "" {
-			continue
-		}
-		if c.Version == "" {
-			findings = append(findings, Finding{sev, "contract_version", d.Doc,
-				fmt.Sprintf("consumes %s %s, but %s declares no version to check against",
-					pyRepr(d.Ref), pyRepr(d.Version), c.Doc)})
-			continue
-		}
-		preds, _ := parseConstraint(d.Version) // validated in parseConsumes
-		ver, _ := parseSemver(c.Version)       // validated in parseProvides
-		if !satisfies(ver, preds) {
-			findings = append(findings, Finding{sev, "contract_version", d.Doc,
-				fmt.Sprintf("consumes %s %s, but %s provides version %s",
-					pyRepr(d.Ref), pyRepr(d.Version), c.Doc, c.Version)})
+		if f, bad := versionFinding(d, c.Version, c.Doc, sev); bad {
+			findings = append(findings, f)
 		}
 	}
-	return findings
+	return append(findings, checkCrossRepo(model, cfg, crossRepo)...)
 }
 
 // manifest is the generated .maat/manifest.json document.

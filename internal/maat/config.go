@@ -147,6 +147,9 @@ func validateConfig(cfg map[string]any) error {
 			return fmt.Errorf("repo must be \"owner/name\", got %s", pyRepr(AnyToStr(repo)))
 		}
 	}
+	if err := validateContractSources(cfg); err != nil {
+		return err
+	}
 	source := checkStr(cfg, "staleness_source", "")
 	if source != "auto" && source != "git" && source != "mtime" {
 		return fmt.Errorf("check.staleness_source must be auto|git|mtime, got %s", pyRepr(source))

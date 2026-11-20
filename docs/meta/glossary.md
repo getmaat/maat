@@ -24,6 +24,10 @@ declaring an interface the doc describes or depends on (ADR 0013).
 contract edge so other repositories and tools can read them without parsing
 Markdown.
 
+**Contracts lockfile** — `.maat/contracts.lock.json`, the committed snapshot
+of the contracts a repository consumes from other repositories. Written by
+`maat contracts update`; read offline by `check` (ADR 0014).
+
 **Derived / generated file** — any file `sync` produces from the source of
 truth (`llms.txt`, adapters, the index navigation block). Never hand-edited;
 `check` reports drift if one differs from what `sync` would write.

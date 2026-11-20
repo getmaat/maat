@@ -70,6 +70,11 @@ discovery list (see
   markers, skills because they are whole-file owned by Ma'at (ADR 0007).
   Editing either by hand will be reported as drift. Team-authored skills under
   `.maat/skills/` with other names are never touched.
+- The contracts lockfile (`.maat/contracts.lock.json`) is **not** a `sync`
+  artifact: it depends on other repositories, so only
+  `maat contracts update` writes it (see
+  [ADR 0014](../../decisions/0014-cross-repo-contracts-via-lockfile.md)).
+  `sync` stays offline.
 - The manifest is emitted even when the repository declares no contracts, so
   its presence never depends on content. Its JSON is sorted and indented, so it
   diffs cleanly and drift detection is byte-exact.

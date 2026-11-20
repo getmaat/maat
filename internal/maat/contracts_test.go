@@ -52,7 +52,9 @@ func TestManifestEmptyByDefault(t *testing.T) {
 
 func TestManifestCollectsSortedEdges(t *testing.T) {
 	root := initRepo(t)
-	writeFile(t, root, ".maat.yml", "repo: acme/billing\n")
+	writeFile(t, root, ".maat.yml", "repo: acme/billing\ncontracts:\n  sources:\n    acme/ledger:\n")
+	writeFile(t, root, lockPath, `{"schema": 1, "sources": {"acme/ledger": {"manifest_schema": 1,
+		"provides": [{"id": "ledger-events"}]}}}`)
 	writeFile(t, root, "api/openapi.yaml", "openapi: 3.1.0\n")
 	contractDoc(t, root, "invoice", "provides:\n  - id: invoice-api\n    kind: http-api\n"+
 		"    version: 2.1.0\n    spec: api/openapi.yaml\n  - id: audit-log\n")
@@ -146,14 +148,6 @@ func TestContractUnresolvedLocalRef(t *testing.T) {
 	out, code := syncAndCheck(t, root)
 	if code != 1 || !strings.Contains(out, "contract_unresolved") {
 		t.Errorf("expected contract_unresolved, got exit %d:\n%s", code, out)
-	}
-}
-
-func TestContractCrossRepoRefsAreNotResolved(t *testing.T) {
-	root := initRepo(t)
-	contractDoc(t, root, "client", "consumes:\n  - ref: acme/elsewhere#api\n    version: \"~> 9\"\n")
-	if out, code := syncAndCheck(t, root); code != 0 {
-		t.Errorf("cross-repo refs must not be resolved yet, got exit %d:\n%s", code, out)
 	}
 }
 
