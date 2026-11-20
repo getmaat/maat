@@ -45,8 +45,10 @@ def seg(line):
         return [['err', line]]
     if line.startswith('+') and not line.startswith('+++'):
         return [['ok', line]]
-    if line.startswith(("Ma'at initialized", 'Next:', 'Run `')):
+    if line.startswith(("Ma'at initialized", 'Next:', 'Run `', 'Optional:')):
         return [['muted', line]]
+    if line.startswith('  [!['):  # the README badge snippet init offers
+        return [['teal', line]]
     return [['ink', line]]
 
 
@@ -71,7 +73,7 @@ def out(name, per=0.035, keep=None):
 story = [
     {'k': 'cmd', 'text': 'maat init . --name Billing --summary "Invoices and payments."'},
     out('init.txt', per=0.045),
-    {'k': 'pause', 's': 1.1},
+    {'k': 'pause', 's': 2.6},  # long enough to read the closing hints and badge offer
     {'k': 'clear'},
     {'k': 'comment', 'text': '# describe the code, and the contracts it depends on'},
     {'k': 'cmd', 'text': 'cat docs/architecture/modules/auth.md'},

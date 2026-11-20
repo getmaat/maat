@@ -13,7 +13,7 @@ html,body { width:1200px; height:720px; overflow:hidden;
 .bar { height:40px; background:var(--bar); display:flex; align-items:center; padding:0 16px; gap:8px; border-bottom:1px solid rgba(255,255,255,.04); }
 .dot { width:12px; height:12px; border-radius:50%; }
 .title { flex:1; text-align:center; font: 600 13px "InterV", sans-serif; color:var(--muted); margin-right:52px; letter-spacing:.02em; }
-.body { padding:20px 24px; font-family:"JB", monospace; font-size:17.5px; line-height:27px; font-variant-ligatures:none; font-feature-settings:"liga" 0, "calt" 0; color:var(--ink); white-space:pre-wrap; word-break:break-word; }
+.body { position:absolute; top:40px; left:0; right:0; bottom:0; overflow:hidden; padding:20px 24px; font-family:"JB", monospace; font-size:17.5px; line-height:27px; font-variant-ligatures:none; font-feature-settings:"liga" 0, "calt" 0; color:var(--ink); white-space:pre-wrap; word-break:break-word; }
 .l { min-height:27px; }
 .teal{color:var(--teal-hi)} .gold{color:var(--gold)} .ink{color:var(--ink)} .muted{color:var(--muted)}
 .ok{color:#5fe49a} .warn{color:var(--gold)} .err{color:var(--pink)} .b{font-weight:700}
@@ -83,7 +83,10 @@ function render(t) {
       ? `<span class="pr-dir">billing</span> <span class="pr-sig">$</span> ${typed}${cursor}`
       : `<span class="cm">${typed}</span>${cursor}`);
   }
-  document.getElementById('body').innerHTML = lines.slice(-MAX_LINES).map(l => `<div class="l">${l}</div>`).join('');
+  const body = document.getElementById('body');
+  body.innerHTML = lines.slice(-MAX_LINES).map(l => `<div class="l">${l}</div>`).join('');
+  // Long lines wrap, so trim from the top until everything fits, like a terminal scrolling.
+  while (body.scrollHeight > body.clientHeight && body.firstChild) body.removeChild(body.firstChild);
   const op = endAt === null ? 0 : Math.max(0, Math.min(1, (t - endAt) / 0.6));
   document.getElementById('end').style.opacity = op;
 }
