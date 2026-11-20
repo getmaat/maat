@@ -1,20 +1,9 @@
-# Ma'at
-
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/maat-logo.webp">
-    <source media="(prefers-color-scheme: light)" srcset=".github/assets/maat-logo-light.webp">
-    <img src=".github/assets/maat-logo-light.webp" alt="Ma'at logo" width="420">
-  </picture>
+  <img src=".github/assets/banner.webp" alt="Ma'at: docs your agents can trust. Docs, code and agent instructions stay in sync, API contracts are checked across repos, and CI fails the moment they drift." width="100%">
 </p>
 
 <p align="center">
   <strong>Documentation-as-code for humans and AI agents.</strong>
-</p>
-
-<p align="center">
-  Your AI agents act on what your docs say. Ma'at makes sure it's still true —<br>
-  within a repository and across repositories — and fails CI when it isn't.
 </p>
 
 <p align="center">
@@ -33,13 +22,15 @@
 
 ## What it catches
 
+![Demo: maat init, then a code-only change makes a doc stale, and a provider's breaking contract version fails maat check](.github/assets/demo.gif)
+
 One pull request changes the token lifetime in code but not in the docs. Another refreshes the contracts lockfile, which pulls in a new major version of an event the repository consumes. `maat check` in CI:
 
 ```text
-✖ [contract_version] docs/architecture/modules/ledger-client.md: consumes 'acme/ledger#ledger-events' '~> 1.4', but acme/ledger@9b41c07 provides version 2.0.0
+✖ [contract_version] docs/architecture/modules/auth.md: consumes 'acme/ledger#ledger-events' '~> 1.6', but acme/ledger provides version 2.0.0
 ⚠ [staleness] docs/architecture/modules/auth.md: code internal/auth/token.go changed after this doc was last updated — review the doc and update it in the same change
 
-Checked 15 document(s): 1 error(s), 1 warning(s).
+Checked 14 document(s): 1 error(s), 1 warning(s).
 ```
 
 Without this, the next agent session would read "tokens expire after 15 minutes" and build on it. More and more code is written by agents that trust the repository's docs, which makes stale docs a correctness problem, not a cosmetic one.
@@ -58,8 +49,6 @@ go install github.com/getmaat/maat@latest
 maat init . --name "My Project" --summary "What it does"
 maat check
 ```
-
-![maat init scaffolding a repository, then maat check validating it](.github/assets/demo.gif)
 
 `maat init` is safe to re-run and never overwrites files you already have. If your repository already has an `AGENTS.md`, Ma'at keeps your prose and adds its maintenance rules in a clearly marked managed block.
 
@@ -226,7 +215,7 @@ CLAUDE.md, GEMINI.md, .hermes.md, .github/copilot-instructions.md,
 
 ## Why not just…
 
-**…an `AGENTS.md`?** Keep it — Ma'at builds on it. An instruction file alone has nothing that tells you when it, or the docs it points to, stopped matching the code. Ma'at adds the link to the code and the CI check.
+**…an `AGENTS.md`?** Keep it: Ma'at builds on it. An instruction file alone has nothing that tells you when it, or the docs it points to, stopped matching the code. Ma'at adds the link to the code and the CI check.
 
 **…a docs site generator?** Ma'at doesn't render websites. It keeps repository-local docs correct; publish them with whatever you like.
 
@@ -278,6 +267,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for development setup.
 
 ## License
 
-Apache-2.0 — see [`LICENSE`](LICENSE).
+Apache-2.0. See [`LICENSE`](LICENSE).
 
 <sub>Ma'at is the ancient Egyptian concept of truth, balance and order.</sub>
