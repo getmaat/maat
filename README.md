@@ -145,9 +145,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0   # full history, so staleness can compare commits
-      - uses: getmaat/maat@v0.9.0
+      - uses: getmaat/maat@v0.10.0
         with:
-          version: "0.9.0"
+          version: "0.10.0"
 ```
 
 Make the job required, and documentation drift blocks a merge like a failing test.
@@ -159,7 +159,7 @@ on:
   schedule: [{cron: "17 6 * * *"}]
 jobs:
   contracts:
-    uses: getmaat/maat/.github/workflows/maat-check.yml@v0.9.0
+    uses: getmaat/maat/.github/workflows/maat-check.yml@v0.10.0
     with:
       contracts_update_check: true   # runs `maat contracts update --check`
 ```
